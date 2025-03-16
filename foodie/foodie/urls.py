@@ -20,4 +20,5 @@ from foodie_app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('upload/', views.upload_image, name='upload_image'),
 ]
