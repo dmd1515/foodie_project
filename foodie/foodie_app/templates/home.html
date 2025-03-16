@@ -18,29 +18,29 @@
         /* Sidebar Styles */
         .sidebar {
             width: 250px;
-            background-color: #000; /* Juodas fonas */
+            background-color: #000;
             color: #fff;
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Centruojame turinį horizontaliai */
+            align-items: center;
         }
 
         .sidebar h1 {
             font-size: 2rem;
             margin-bottom: 20px;
-            text-transform: uppercase; /* Pavadinimas didžiosiomis raidėmis */
-            text-align: center; /* Centruojame tekstą */
-            color: #fff; /* Baltas tekstas */
+            text-transform: uppercase;
+            text-align: center;
+            color: #fff;
         }
 
         .sidebar ul {
             list-style: none;
             padding: 0;
             margin: 0;
-            width: 100%; /* Užima visą plotį */
+            width: 100%;
         }
 
         .sidebar ul li {
@@ -58,7 +58,7 @@
         }
 
         .sidebar ul li a:hover {
-            background-color: #333; /* Tamsesnis atspalvis užvedus */
+            background-color: #333;
         }
 
         /* Main Content Styles */
@@ -143,6 +143,12 @@
             background-color: #218838;
         }
 
+        .char-counter {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
@@ -202,7 +208,7 @@
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <h1>FOODIE</h1> <!-- Pavadinimas didžiosiomis raidėmis -->
+        <h1>FOODIE</h1>
         <ul>
             <li><a href="#">Home</a></li>
             <li><a href="#">Recipes</a></li>
@@ -221,12 +227,16 @@
 
         <!-- Chat Input and Buttons -->
         <div class="chat-input-container">
-            <textarea placeholder="Type your message..."></textarea>
+            <textarea id="chat-input" placeholder="Type your message..." maxlength="300"></textarea>
             <div class="photo-buttons">
                 <button id="add-photo-button">Add Photo</button>
                 <button id="scan-camera-button">Scan Object with Camera</button>
             </div>
             <button id="send-button">Send</button>
+        </div>
+        <!-- Character Counter -->
+        <div class="char-counter">
+            <span id="char-count">0</span>/300
         </div>
     </div>
 
@@ -245,6 +255,25 @@
         document.getElementById('send-button').addEventListener('click', function() {
             alert('Send button clicked!');
             // Add logic to send the message
+        });
+
+        // Character counter logic
+        const textarea = document.getElementById('chat-input');
+        const charCount = document.getElementById('char-count');
+
+        // Initialize the counter with the current length of the textarea
+        charCount.textContent = textarea.value.length;
+
+        textarea.addEventListener('input', function() {
+            const currentLength = textarea.value.length;
+            charCount.textContent = currentLength;
+
+            // Optional: Change color if approaching the limit
+            if (currentLength >= 280) {
+                charCount.style.color = 'red';
+            } else {
+                charCount.style.color = '#666';
+            }
         });
     </script>
 </body>
