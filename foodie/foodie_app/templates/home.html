@@ -293,7 +293,7 @@
 
       <!-- Chat Input and Buttons -->
       <div class="chat-input-container">
-        <textarea placeholder="Type your message..."></textarea>
+        <textarea id=prompt-area placeholder="Type your message..."></textarea>
         <div class="photo-buttons">
           <button id="add-photo-button">Add Photo</button>
           <button id="scan-camera-button">Scan Object with Camera</button>
@@ -337,7 +337,9 @@
         </form>
       </div>
     </div>
-    <script>
+    <script type="module">
+            import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-ai";
+            console.log("GoogleGenerativeAI loaded:", GoogleGenerativeAI);
       // JavaScript for handling button clicks
       document
         .getElementById("add-photo-button")
@@ -358,10 +360,7 @@
 
       document
         .getElementById("send-button")
-        .addEventListener("click", function () {
-          alert("Send button clicked!");
-          // Add logic to send the message
-        });
+        .addEventListener("click", sendPrompt);
       document
         .getElementById("upload-form")
         .addEventListener("submit", function (e) {
@@ -426,6 +425,16 @@
 
         // Hide the modal
         modal.style.display = "none";
+      }
+      async function sendPrompt() {
+        //alert(document.getElementById("prompt-area").value);  
+
+        const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RGYzNWd2SWVzT01XTFJJeHB3blFuOUc1MEpJOVpsTkNz"));
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const prompt = document.getElementById("prompt-area").value;
+
+        const result = await model.generateContent(prompt);
+        console.log(result.response.text());
       }
     </script>
   </body>
