@@ -285,7 +285,7 @@
     <div class="main-content">
       <div class="chat-area">
         <h2>Chat</h2>
-        <div class="chat-messages">
+        <div id="chat-messages" class="chat-messages">
           <div class="message">Hello! How can I help you today?</div>
           <div class="message">I need help with my food order.</div>
         </div>
@@ -433,8 +433,19 @@
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const prompt = document.getElementById("prompt-area").value;
 
+        var promptMessage = document.createElement('div');
+        promptMessage.classList.add("message")
+        promptMessage.textContent = document.getElementById("prompt-area").value;
+        document.getElementById("chat-messages").appendChild(promptMessage);  
+
         const result = await model.generateContent(prompt);
         console.log(result.response.text());
+
+        var responseMessage = document.createElement('div');
+        responseMessage.classList.add("message")
+        responseMessage.textContent = result.response.text();
+        document.getElementById("chat-messages").appendChild(responseMessage);  
+        
       }
     </script>
   </body>
