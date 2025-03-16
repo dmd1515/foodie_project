@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodie - Chat Layout</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #000; /* Juodas fonas */
+            color: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centruojame turinį horizontaliai */
+        }
+
+        .sidebar h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-transform: uppercase; /* Pavadinimas didžiosiomis raidėmis */
+            text-align: center; /* Centruojame tekstą */
+            color: #fff; /* Baltas tekstas */
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%; /* Užima visą plotį */
+        }
+
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            display: block;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #333; /* Tamsesnis atspalvis užvedus */
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f4f4f4;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .chat-area {
+            flex: 1;
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow-y: auto;
+        }
+
+        .chat-area h2 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .chat-messages {
+            margin-bottom: 20px;
+        }
+
+        .chat-messages .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input-container textarea {
+            flex: 1;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            resize: none;
+            font-size: 1rem;
+        }
+
+        .chat-input-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .chat-input-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .chat-input-container .photo-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-container .photo-buttons button {
+            background-color: #28a745;
+        }
+
+        .chat-input-container .photo-buttons button:hover {
+            background-color: #218838;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .sidebar h1 {
+                font-size: 1.5rem;
+            }
+
+            .sidebar ul li a {
+                font-size: 0.9rem;
+            }
+
+            .chat-area h2 {
+                font-size: 1rem;
+            }
+
+            .chat-input-container textarea {
+                font-size: 0.9rem;
+            }
+
+            .chat-input-container button {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 150px;
+            }
+
+            .sidebar h1 {
+                font-size: 1.2rem;
+            }
+
+            .sidebar ul li a {
+                font-size: 0.8rem;
+            }
+
+            .chat-area h2 {
+                font-size: 0.9rem;
+            }
+
+            .chat-input-container textarea {
+                font-size: 0.8rem;
+            }
+
+            .chat-input-container button {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h1>FOODIE</h1> <!-- Pavadinimas didžiosiomis raidėmis -->
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Recipes</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="chat-area">
+            <h2>Chat</h2>
+            <div class="chat-messages">
+                <div class="message">Hello! How can I help you today?</div>
+                <div class="message">I need help with my food order.</div>
+            </div>
+        </div>
+
+        <!-- Chat Input and Buttons -->
+        <div class="chat-input-container">
+            <textarea placeholder="Type your message..."></textarea>
+            <div class="photo-buttons">
+                <button id="add-photo-button">Add Photo</button>
+                <button id="scan-camera-button">Scan Object with Camera</button>
+            </div>
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for handling button clicks
+        document.getElementById('add-photo-button').addEventListener('click', function() {
+            alert('Add Photo button clicked!');
+            // Add logic to upload a photo
+        });
+
+        document.getElementById('scan-camera-button').addEventListener('click', function() {
+            alert('Scan Object with Camera button clicked!');
+            // Add logic to open the camera
+        });
+
+        document.getElementById('send-button').addEventListener('click', function() {
+            alert('Send button clicked!');
+            // Add logic to send the message
+        });
+    </script>
+</body>
+</html>
