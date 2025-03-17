@@ -370,6 +370,37 @@
         <!-- Chat Input and Buttons -->
         <div class="chat-input-container">
             <textarea id="chat-input" placeholder="Type your message..." maxlength="300"></textarea>
+            <div> 
+              <select name="Meal time" id="Meal-time">
+                <option value="default", selected="selected">Any time</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Night">Night snack</option>
+              </select>
+              <select name="Meal type" id="Meal-type">
+                <option value="default", selected="selected">Any type</option>
+                <option value="Main dish">Main dish</option>
+                <option value="Side dish">Side dish</option>
+                <option value="Desert">Desert</option>
+                <option value="Soup">Soup</option>
+                <option value="non-Alcohol drink">Alcohol-free drink</option>
+                <option value="Alcohol drink">Alcohol drink</option>
+              </select>
+              <select name="Difficulty" id="Difficulty">
+                <option value="default", selected="selected">Any difficulty</option>
+                <option value="Beginners">Beginner</option>
+                <option value="Intermediates">Intermediate</option>
+                <option value="Experts">Expert</option>
+              </select>
+              <select name="Cook time" id="Cook-time">
+                <option value="default", selected="selected">Any cook time</option>
+                <option value="Less than 10 min">Less than 10 min.</option>
+                <option value="Less than 30 min">Less than 30 min.</option>
+                <option value="Less than 1 h">Less than 1 h.</option>
+                <option value="More than 1 h">Longer than 1h.</option>
+              </select>
+            </div>
             <div class="photo-buttons">
                 <button id="add-photo-button">Add Photo</button>
                 <button id="scan-camera-button">Scan Object with Camera</button>
