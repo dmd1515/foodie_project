@@ -361,7 +361,7 @@
 
       document
         .getElementById("send-button")
-        .addEventListener("click", sendPrompt);
+        .addEventListener("click", sendUserPrompt);
       document
         .getElementById("upload-form")
         .addEventListener("submit", function (e) {
@@ -427,26 +427,29 @@
         // Hide the modal
         modal.style.display = "none";
       }
-      async function sendPrompt() {
-        //alert(document.getElementById("prompt-area").value);  
 
+      async function sendPrompt(userPrompt){
         const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RGYzNWd2SWVzT01XTFJJeHB3blFuOUc1MEpJOVpsTkNz"));
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const prompt = document.getElementById("prompt-area").value;
-
-        var promptMessage = document.createElement('div');
-        promptMessage.classList.add("message")
-        promptMessage.textContent = document.getElementById("prompt-area").value;
-        document.getElementById("chat-messages").appendChild(promptMessage);  
-
+        const prompt = userPrompt;
+        
         const result = await model.generateContent(prompt);
         console.log(result.response.text());
+        return result;
+      }
 
-        var responseMessage = document.createElement('div');
-        responseMessage.classList.add("message")
-        responseMessage.textContent = result.response.text();
-        document.getElementById("chat-messages").appendChild(responseMessage);  
-        
+      async function addMessage(text){
+        var message = document.createElement('div');
+        message.classList.add("message")
+        message.textContent = text;
+        document.getElementById("chat-messages").appendChild(message);  
+      }
+
+      async function sendUserPrompt() {
+        addMessage(document.getElementById("prompt-area").value)
+        var result = await sendPrompt(document.getElementById("prompt-area").value);
+        addMessage(result.response.text())
+        test
       }
     </script>
   </body>
