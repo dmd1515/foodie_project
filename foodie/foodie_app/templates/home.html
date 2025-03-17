@@ -686,8 +686,21 @@
 
       async function sendUserPrompt(text) {
         var templatePrompt1 = "Generate 3 recipes using these ingredients: ";
-        var templatePrompt2 = ". One of these recipes must made with only the mentioned ingredients and nothing more. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
-        return await sendPrompt(templatePrompt1 + text + templatePrompt2);
+        var templatePrompt2 = ". "
+        var mealTime = document.getElementById("Meal-time").value 
+        if(mealTime != "default")
+          templatePrompt2 += "These must be " + mealTime + "recipes";
+        var mealType = document.getElementById("Meal-type").value
+        if(mealType != "default")
+          templatePrompt2 += " for a " + mealType;
+        var mealDiff = document.getElementById("Difficulty").value
+        if(mealDiff != "default")
+          templatePrompt2 += " meant to be cooked by " + mealDiff;
+        var cookTime = document.getElementById("Cook-time").value
+        if(cookTime != "default")
+          templatePrompt2 += " that is made in " + cookTime;
+        var templatePrompt4 = ". One of these recipes must made with only the mentioned ingredients and nothing more. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
+        return await sendPrompt(templatePrompt1 + templatePrompt2 + text + templatePrompt4);
       }
     </script>
 </body>
