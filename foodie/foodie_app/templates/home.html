@@ -127,6 +127,7 @@
             padding: 10px;
             border-radius: 4px;
             transition: background-color 0.3s;
+            border: 2px solid #fff; /* Baltas apvadas */
         }
 
         .sidebar ul li a:hover {
@@ -154,8 +155,9 @@
         }
 
         .chat-area h2 {
-            font-size: 1.2rem;
+            font-size: 2rem; /* Padidintas šrifto dydis */
             margin-bottom: 20px;
+            text-align: center; /* Centruojame tekstą */
         }
 
         .chat-messages {
@@ -285,7 +287,7 @@
             }
 
             .chat-area h2 {
-                font-size: 1rem;
+                font-size: 1.5rem; /* Mažesnis šrifto dydis mažesniuose ekranuose */
             }
 
             .chat-input-container textarea {
@@ -312,7 +314,7 @@
             }
 
             .chat-area h2 {
-                font-size: 0.9rem;
+                font-size: 1.2rem; /* Dar mažesnis šrifto dydis labai mažuose ekranuose */
             }
 
             .chat-input-container textarea {
@@ -339,7 +341,7 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="chat-area">
-            <h2>Chat</h2>
+            <h2>Chat with Foodie</h2> <!-- Pakeistas tekstas ir stilius -->
             <div class="chat-messages" id="chat-messages">
                 <!-- Example messages -->
                 <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
