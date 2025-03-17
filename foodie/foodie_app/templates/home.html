@@ -1,166 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Foodie - Chat Layout</title>
     <style>
-        /* Global Styles */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
 
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
+      .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 300px;
+        text-align: center;
+      }
 
-        .modal-content {
-            background-color: #fff;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
-        }
+      /* File input and preview styles */
+      .file-input-container {
+        margin-bottom: 20px;
+      }
 
-        /* File input and preview styles */
-        .file-input-container {
-            margin-bottom: 20px;
-        }
+      #image-input {
+        display: none; /* Hide the default file input */
+      }
 
-        #image-input {
-            display: none; /* Hide the default file input */
-        }
+      #image-preview {
+        max-width: 100%;
+        max-height: 150px;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
 
-        #image-preview {
-            max-width: 100%;
-            max-height: 150px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
+      /* Button styles */
+      .button-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
 
-        /* Button styles */
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
+      .upload-button,
+      .close-modal {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        flex: 1;
+      }
 
-        .upload-button,
-        .close-modal {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            flex: 1;
-        }
+      .upload-button {
+        background-color: #007bff; /* Blue color */
+        color: #fff;
+      }
 
-        .upload-button {
-            background-color: #007bff; /* Blue color */
-            color: #fff;
-        }
+      .upload-button:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+      }
 
-        .upload-button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
-        }
+      .close-modal {
+        background-color: #6c757d; /* Gray color */
+        color: #fff;
+      }
 
-        .close-modal {
-            background-color: #6c757d; /* Gray color */
-            color: #fff;
-        }
+      .close-modal:hover {
+        background-color: #5a6268; /* Darker gray on hover */
+      }
 
-        .close-modal:hover {
-            background-color: #5a6268; /* Darker gray on hover */
-        }
+      /* Sidebar Styles */
+      .sidebar {
+        width: 250px;
+        background-color: #000; /* Juodas fonas */
+        color: #fff;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centruojame turinį horizontaliai */
+      }
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: 250px;
-            background-color: #000; /* Juodas fonas */
-            color: #fff;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Centruojame turinį horizontaliai */
-        }
+      .sidebar h1 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        text-transform: uppercase; /* Pavadinimas didžiosiomis raidėmis */
+        text-align: center; /* Centruojame tekstą */
+        color: #fff; /* Baltas tekstas */
+      }
 
-        .sidebar h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            text-transform: uppercase; /* Pavadinimas didžiosiomis raidėmis */
-            text-align: center; /* Centruojame tekstą */
-            color: #fff; /* Baltas tekstas */
-        }
+      .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%; /* Užima visą plotį */
+      }
 
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            width: 100%; /* Užima visą plotį */
-        }
+      .sidebar ul li {
+        margin-bottom: 10px;
+      }
 
-        .sidebar ul li {
-            margin-bottom: 10px;
-        }
+      .sidebar ul li a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 1rem;
+        display: block;
+        padding: 10px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
 
-        .sidebar ul li a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1rem;
-            display: block;
-            padding: 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
+      .sidebar ul li a:hover {
+        background-color: #333; /* Tamsesnis atspalvis užvedus */
+      }
 
-        .sidebar ul li a:hover {
-            background-color: #333; /* Tamsesnis atspalvis užvedus */
-        }
+      /* Main Content Styles */
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #f4f4f4;
+        padding: 20px;
+        overflow-y: auto;
+      }
 
-        /* Main Content Styles */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: #f4f4f4;
-            padding: 20px;
-            overflow-y: auto;
-        }
+      .chat-area {
+        flex: 1;
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow-y: auto;
+      }
 
-        .chat-area {
-            flex: 1;
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            overflow-y: auto;
-        }
+      .chat-area h2 {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+      }
 
-        .chat-area h2 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-
-        .chat-messages {
-            margin-bottom: 20px;
-        }
+      .chat-messages {
+        margin-bottom: 20px;
+      }
 
         .chat-messages .message {
             margin-bottom: 10px;
@@ -201,47 +200,47 @@
             color: #000;
         }
 
-        .chat-input-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+      .chat-input-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
 
-        .chat-input-container textarea {
-            flex: 1;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            resize: none;
-            font-size: 1rem;
-        }
+      .chat-input-container textarea {
+        flex: 1;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        resize: none;
+        font-size: 1rem;
+      }
 
-        .chat-input-container button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-            font-size: 1rem;
-        }
+      .chat-input-container button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        font-size: 1rem;
+      }
 
-        .chat-input-container button:hover {
-            background-color: #0056b3;
-        }
+      .chat-input-container button:hover {
+        background-color: #0056b3;
+      }
 
-        .chat-input-container .photo-buttons {
-            display: flex;
-            gap: 10px;
-        }
+      .chat-input-container .photo-buttons {
+        display: flex;
+        gap: 10px;
+      }
 
-        .chat-input-container .photo-buttons button {
-            background-color: #28a745;
-        }
+      .chat-input-container .photo-buttons button {
+        background-color: #28a745;
+      }
 
         .chat-input-container .photo-buttons button:hover {
             background-color: #218838;
@@ -268,63 +267,63 @@
             background-color: #c82333;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-            }
-
-            .sidebar h1 {
-                font-size: 1.5rem;
-            }
-
-            .sidebar ul li a {
-                font-size: 0.9rem;
-            }
-
-            .chat-area h2 {
-                font-size: 1rem;
-            }
-
-            .chat-input-container textarea {
-                font-size: 0.9rem;
-            }
-
-            .chat-input-container button {
-                padding: 8px 16px;
-                font-size: 0.9rem;
-            }
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .sidebar {
+          width: 200px;
         }
 
-        @media (max-width: 480px) {
-            .sidebar {
-                width: 150px;
-            }
-
-            .sidebar h1 {
-                font-size: 1.2rem;
-            }
-
-            .sidebar ul li a {
-                font-size: 0.8rem;
-            }
-
-            .chat-area h2 {
-                font-size: 0.9rem;
-            }
-
-            .chat-input-container textarea {
-                font-size: 0.8rem;
-            }
-
-            .chat-input-container button {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-            }
+        .sidebar h1 {
+          font-size: 1.5rem;
         }
+
+        .sidebar ul li a {
+          font-size: 0.9rem;
+        }
+
+        .chat-area h2 {
+          font-size: 1rem;
+        }
+
+        .chat-input-container textarea {
+          font-size: 0.9rem;
+        }
+
+        .chat-input-container button {
+          padding: 8px 16px;
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .sidebar {
+          width: 150px;
+        }
+
+        .sidebar h1 {
+          font-size: 1.2rem;
+        }
+
+        .sidebar ul li a {
+          font-size: 0.8rem;
+        }
+
+        .chat-area h2 {
+          font-size: 0.9rem;
+        }
+
+        .chat-input-container textarea {
+          font-size: 0.8rem;
+        }
+
+        .chat-input-container button {
+          padding: 6px 12px;
+          font-size: 0.8rem;
+        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Sidebar -->
     <div class="sidebar">
         <h1>FOODIE</h1>
@@ -382,16 +381,22 @@
         </div>
     </div>
     <script>
-        // JavaScript for handling button clicks
-        document.getElementById("add-photo-button").addEventListener("click", function () {
-            document.getElementById("upload-modal").style.display = "flex"; // Open the modal
+      // JavaScript for handling button clicks
+      document
+        .getElementById("add-photo-button")
+        .addEventListener("click", function () {
+          document.getElementById("upload-modal").style.display = "flex"; // Open the modal
         });
 
-        document.querySelector(".close-modal").addEventListener("click", closeModal);
+      document
+        .querySelector(".close-modal")
+        .addEventListener("click", closeModal);
 
-        document.getElementById("scan-camera-button").addEventListener("click", function () {
-            alert("Scan Object with Camera button clicked!");
-            // Add logic to open the camera
+      document
+        .getElementById("scan-camera-button")
+        .addEventListener("click", function () {
+          alert("Scan Object with Camera button clicked!");
+          // Add logic to open the camera
         });
 
         // Send message logic
@@ -504,68 +509,71 @@
                 charCount.style.color = '#666';
             }
         });
+      document
+        .getElementById("upload-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
 
-        document.getElementById("upload-form").addEventListener("submit", function (e) {
-            e.preventDefault();
+          let formData = new FormData(this);
 
-            let formData = new FormData(this);
+          fetch("{% url 'upload_image' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+              "X-CSRFToken": document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+              ).value,
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.message) {
+                alert(data.message); // Success message
+                document.getElementById("upload-modal").style.display = "none"; // Close the modal
 
-            fetch("{% url 'upload_image' %}", {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
-                },
+                // Clear the file input
+                closeModal();
+              } else if (data.error) {
+                alert(data.error); // Error message
+              }
             })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.message) {
-                        alert(data.message); // Success message
-                        document.getElementById("upload-modal").style.display = "none"; // Close the modal
-
-                        // Clear the file input
-                        closeModal();
-                    } else if (data.error) {
-                        alert(data.error); // Error message
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    alert("Something went wrong!");
-                });
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("Something went wrong!");
+            });
         });
+      document
+        .getElementById("image-input")
+        .addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          const preview = document.getElementById("image-preview");
 
-        document.getElementById("image-input").addEventListener("change", function (event) {
-            const file = event.target.files[0];
-            const preview = document.getElementById("image-preview");
+          if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
 
-            if (file && file.type.startsWith("image/")) {
-                const reader = new FileReader();
+            reader.onload = function (e) {
+              preview.src = e.target.result;
+              preview.style.display = "block";
+            };
 
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                    preview.style.display = "block";
-                };
-
-                reader.readAsDataURL(file);
-            } else {
-                preview.style.display = "none";
-            }
+            reader.readAsDataURL(file);
+          } else {
+            preview.style.display = "none";
+          }
         });
+      function closeModal() {
+        const modal = document.getElementById("upload-modal");
+        const fileInput = document.getElementById("image-input");
+        const imagePreview = document.getElementById("image-preview");
 
-        function closeModal() {
-            const modal = document.getElementById("upload-modal");
-            const fileInput = document.getElementById("image-input");
-            const imagePreview = document.getElementById("image-preview");
+        // Reset the file input and clear the preview
+        fileInput.value = ""; // Clear the file input
+        imagePreview.src = "#"; // Clear the image preview
+        imagePreview.style.display = "none"; // Hide the preview
 
-            // Reset the file input and clear the preview
-            fileInput.value = ""; // Clear the file input
-            imagePreview.src = "#"; // Clear the image preview
-            imagePreview.style.display = "none"; // Hide the preview
-
-            // Hide the modal
-            modal.style.display = "none";
-        }
+        // Hide the modal
+        modal.style.display = "none";
+      }
     </script>
-</body>
+  </body>
 </html>
