@@ -17,14 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from foodie_app import views
+from foodie_app.views import send_message  # Importuojame send_message view iš foodie_app aplikacijos
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('upload/', views.upload_image, name='upload_image'),
+    path('send-message/', send_message, name='send_message'), 
 ]
 
-from foodie_app.views import send_message  # Importuojame send_message view iš foodie_app aplikacijos
 
-urlpatterns = [
-    path('send-message/', send_message, name='send_message'),  # Susiejame URL su view
-]
+

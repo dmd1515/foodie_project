@@ -37,3 +37,6 @@ def send_message(request):
 
     # Jei užklausa netinkama, grąžiname klaidą
     return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+def home(request):
+    return render(request, 'home.html')  # Grąžiname pagrindinį šabloną
