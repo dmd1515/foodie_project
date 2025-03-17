@@ -22,3 +22,9 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('upload/', views.upload_image, name='upload_image'),
 ]
+
+from foodie_app.views import send_message  # Importuojame send_message view iš foodie_app aplikacijos
+
+urlpatterns = [
+    path('send-message/', send_message, name='send_message'),  # Susiejame URL su view
+]

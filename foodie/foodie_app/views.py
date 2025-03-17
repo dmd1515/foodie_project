@@ -17,3 +17,21 @@ def upload_image(request):
         except ValidationError as e:
             return JsonResponse({"error": str(e)}, status=400)
     return redirect('home')
+
+def send_message(request):
+    # Tikriname, ar užklausa yra POST ir AJAX
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        message = request.POST.get('message', '').strip()  # Gauname žinutę ir pašaliname tarpus
+
+        # Tikriname, ar žinutė yra tuščia
+        if not message:
+            return JsonResponse({'error': 'Message cannot be empty.'}, status=400)
+
+        # Čia būtų logika, kuri apdoroja žinutę (pvz., išsaugojimas duomenų bazėje)
+        # Pavyzdys:
+        # save_message_to_database(message)
+
+        return JsonResponse({'success': 'Message sent!'})
+
+    # Jei užklausa netinkama, grąžiname klaidą
+    return JsonResponse({'error': 'Invalid request.'}, status=400)
