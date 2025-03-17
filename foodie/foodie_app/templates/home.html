@@ -95,6 +95,18 @@
             padding: 10px;
             border-radius: 4px;
             background-color: #e9ecef;
+            max-width: 70%;
+        }
+
+        .chat-messages .message.user {
+            background-color: #007bff;
+            color: #fff;
+            margin-left: auto; /* Align to the right */
+        }
+
+        .chat-messages .message.bot {
+            background-color: #e9ecef;
+            margin-right: auto; /* Align to the left */
         }
 
         .chat-input-container {
@@ -147,6 +159,21 @@
             font-size: 0.9rem;
             color: #666;
             margin-top: 5px;
+        }
+
+        .clear-chat-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #dc3545;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .clear-chat-button:hover {
+            background-color: #c82333;
         }
 
         /* Responsive Design */
@@ -219,9 +246,9 @@
     <div class="main-content">
         <div class="chat-area">
             <h2>Chat</h2>
-            <div class="chat-messages">
-                <div class="message">Hello! How can I help you today?</div>
-                <div class="message">I need help with my food order.</div>
+            <div class="chat-messages" id="chat-messages">
+                <!-- Example messages -->
+                <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
             </div>
         </div>
 
@@ -238,6 +265,9 @@
         <div class="char-counter">
             <span id="char-count">0</span>/300
         </div>
+
+        <!-- Clear Chat Button -->
+        <button class="clear-chat-button" id="clear-chat-button">Clear Chat</button>
     </div>
 
     <script>
@@ -252,9 +282,49 @@
             // Add logic to open the camera
         });
 
+        // Send message logic
         document.getElementById('send-button').addEventListener('click', function() {
-            alert('Send button clicked!');
-            // Add logic to send the message
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+
+            // Get the message from the input
+            const messageText = chatInput.value.trim();
+
+            if (messageText) {
+                // Remove initial messages if they exist
+                const initialMessage1 = document.getElementById('initial-message-1');
+                const initialMessage2 = document.getElementById('initial-message-2');
+                if (initialMessage1 && initialMessage2) {
+                    initialMessage1.remove();
+                    initialMessage2.remove();
+                }
+
+                // Create a new message element
+                const newMessage = document.createElement('div');
+                newMessage.className = 'message user'; // Add 'user' class for user messages
+                newMessage.textContent = messageText;
+
+                // Append the new message to the chat area
+                chatMessages.appendChild(newMessage);
+
+                // Clear the input field
+                chatInput.value = '';
+
+                // Reset the character counter
+                document.getElementById('char-count').textContent = '0';
+
+                // Scroll to the bottom of the chat area
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+
+        // Clear chat logic
+        document.getElementById('clear-chat-button').addEventListener('click', function() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = `
+                <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
+                <div class="message bot" id="initial-message-2">I need help with my food order.</div>
+            `;
         });
 
         // Character counter logic
