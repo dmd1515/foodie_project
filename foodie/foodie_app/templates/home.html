@@ -446,10 +446,11 @@
       }
 
       async function sendUserPrompt() {
-        addMessage(document.getElementById("prompt-area").value)
-        var result = await sendPrompt(document.getElementById("prompt-area").value);
+        addMessage("You entered: " + document.getElementById("prompt-area").value)
+        var templatePrompt1 = "Generate 3 recipes using these ingredients: ";
+        var templatePrompt2 = ". One of these recipes must made with only the mentioned ingredients and nothing more. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
+        var result = await sendPrompt(templatePrompt1 + document.getElementById("prompt-area").value + templatePrompt2);
         addMessage(result.response.text())
-        test
       }
     </script>
   </body>
