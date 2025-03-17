@@ -216,6 +216,13 @@
         .chat-messages .message.bot .edit-button {
             color: #000;
         }
+      .chat-messages .message {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        background-color: #e9ecef;
+        white-space: pre;
+      }
 
         .chat-input-container {
             display: flex;
@@ -399,7 +406,9 @@
             </form>
         </div>
     </div>
-    <script>
+    <script type="module">
+            import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-ai";
+            console.log("GoogleGenerativeAI loaded:", GoogleGenerativeAI);
         // JavaScript for handling button clicks
         document.getElementById("add-photo-button").addEventListener("click", function () {
             document.getElementById("upload-modal").style.display = "flex"; // Open the modal
@@ -412,7 +421,7 @@
             // Add logic to open the camera
         });
 
-        document.getElementById('send-button').addEventListener('click', function() {
+        document.getElementById('send-button').addEventListener('click', async function() {
             const chatInput = document.getElementById('chat-input');
             const chatMessages = document.getElementById('chat-messages');
 
@@ -457,6 +466,22 @@
 
                 // Scroll to the bottom of the chat area
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                var result = await sendUserPrompt(messageText)
+
+                                // Create a new message element
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message bot'; // Add 'bot' class for user messages
+                botMessage.textContent = result;
+
+                // Append the new message to the chat area
+                chatMessages.appendChild(botMessage);
+
+                // Clear the input field
+                chatInput.value = '';
+
+                // Reset the character counter
+                document.getElementById('char-count').textContent = '0';
             }
 });
 
@@ -617,6 +642,22 @@
             // Hide the modal
             modal.style.display = "none";
         }
+
+      async function sendPrompt(userPrompt){
+        const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RGYzNWd2SWVzT01XTFJJeHB3blFuOUc1MEpJOVpsTkNz"));
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const prompt = userPrompt;
+        
+        const result = await model.generateContent(prompt);
+        console.log(result.response.text());
+        return result.response.text();
+      }
+
+      async function sendUserPrompt(text) {
+        var templatePrompt1 = "Generate 3 recipes using these ingredients: ";
+        var templatePrompt2 = ". One of these recipes must made with only the mentioned ingredients and nothing more. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
+        return await sendPrompt(templatePrompt1 + text + templatePrompt2);
+      }
     </script>
 </body>
 </html>
