@@ -10,3 +10,4 @@ six @ file:///System/Volumes/Data/SWE/Apps/DT/BuildRoots/BuildRoot7/ActiveBuildR
 sqlparse==0.2.4
 typing_extensions==4.12.2
 djangorestframework
+google-genai==1.5.0

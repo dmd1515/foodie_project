@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Foodie - Chat Layout</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>    </script>
     <style>
         /* Global Styles */
         body {
@@ -216,6 +219,13 @@
         .chat-messages .message.bot .edit-button {
             color: #000;
         }
+      .chat-messages .message {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        background-color: #e9ecef;
+        white-space: pre;
+      }
 
         .chat-input-container {
             display: flex;
@@ -363,6 +373,37 @@
         <!-- Chat Input and Buttons -->
         <div class="chat-input-container">
             <textarea id="chat-input" placeholder="Type your message..." maxlength="300"></textarea>
+            <div> 
+              <select name="Meal time" id="Meal-time">
+                <option value="default", selected="selected">Any time</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Night">Night snack</option>
+              </select>
+              <select name="Meal type" id="Meal-type">
+                <option value="default", selected="selected">Any type</option>
+                <option value="Main dish">Main dish</option>
+                <option value="Side dish">Side dish</option>
+                <option value="Desert">Desert</option>
+                <option value="Soup">Soup</option>
+                <option value="non-Alcohol drink">Alcohol-free drink</option>
+                <option value="Alcohol drink">Alcohol drink</option>
+              </select>
+              <select name="Difficulty" id="Difficulty">
+                <option value="default", selected="selected">Any difficulty</option>
+                <option value="Beginners">Beginner</option>
+                <option value="Intermediates">Intermediate</option>
+                <option value="Experts">Expert</option>
+              </select>
+              <select name="Cook time" id="Cook-time">
+                <option value="default", selected="selected">Any cook time</option>
+                <option value="Less than 10 min">Less than 10 min.</option>
+                <option value="Less than 30 min">Less than 30 min.</option>
+                <option value="Less than 1 h">Less than 1 h.</option>
+                <option value="More than 1 h">Longer than 1h.</option>
+              </select>
+            </div>
             <div class="photo-buttons">
                 <button id="add-photo-button">Add Photo</button>
                 <button id="scan-camera-button">Scan Object with Camera</button>
@@ -399,7 +440,9 @@
             </form>
         </div>
     </div>
-    <script>
+    <script type="module" >
+            import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-ai";
+            console.log("GoogleGenerativeAI loaded:", GoogleGenerativeAI);
         // JavaScript for handling button clicks
         document.getElementById("add-photo-button").addEventListener("click", function () {
             document.getElementById("upload-modal").style.display = "flex"; // Open the modal
@@ -412,8 +455,7 @@
             // Add logic to open the camera
         });
 
-        // Send message logic
-        document.getElementById('send-button').addEventListener('click', function() {
+        document.getElementById('send-button').addEventListener('click', async function() {
             const chatInput = document.getElementById('chat-input');
             const chatMessages = document.getElementById('chat-messages');
 
@@ -429,10 +471,8 @@
             if (messageText) {
                 // Remove initial messages if they exist
                 const initialMessage1 = document.getElementById('initial-message-1');
-                const initialMessage2 = document.getElementById('initial-message-2');
-                if (initialMessage1 && initialMessage2) {
-                    initialMessage1.remove();
-                    initialMessage2.remove();
+                if (initialMessage1) {
+                    initialMessage1.remove(); // Remove the initial message
                 }
 
                 // Create a new message element
@@ -460,8 +500,33 @@
 
                 // Scroll to the bottom of the chat area
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                var result = await sendUserPrompt(messageText)
+
+                                // Create a new message element
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message bot'; // Add 'bot' class for user messages
+                botMessage.textContent = result;
+
+                // Add an edit button to the message
+                const saveButton = document.createElement('button');
+                saveButton.className = 'edit-button';
+                saveButton.textContent = 'Save as PDF';
+                saveButton.addEventListener('click', function() {
+                    SaveRecipeAsPDF(botMessage);
+                });
+                botMessage.appendChild(saveButton);
+
+                // Append the new message to the chat area
+                chatMessages.appendChild(botMessage);
+
+                // Clear the input field
+                chatInput.value = '';
+
+                // Reset the character counter
+                document.getElementById('char-count').textContent = '0';
             }
-        });
+});
 
         // Edit message logic
         function editMessage(messageElement) {
@@ -521,12 +586,21 @@
             });
         }
 
+        function SaveRecipeAsPDF(messageElement) {
+          const doc = new jsPDF();
+          const text = messageElement.textContent;
+  
+          doc.setFontSize(8);
+          doc.text(text, 10, 10);
+          // force download
+          doc.save('Recipe.pdf');
+        }
+
         // Clear chat logic
         document.getElementById('clear-chat-button').addEventListener('click', function() {
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = `
                 <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
-                <div class="message bot" id="initial-message-2">I need help with my food order.</div>
             `;
         });
 
@@ -621,6 +695,35 @@
             // Hide the modal
             modal.style.display = "none";
         }
+
+      async function sendPrompt(userPrompt){
+        const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RGYzNWd2SWVzT01XTFJJeHB3blFuOUc1MEpJOVpsTkNz"));
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const prompt = userPrompt;
+        
+        const result = await model.generateContent(prompt);
+        console.log(result.response.text());
+        return result.response.text();
+      }
+
+      async function sendUserPrompt(text) {
+        var templatePrompt1 = "Generate 3 recipes using these ingredients: ";
+        var templatePrompt2 = ". "
+        var mealTime = document.getElementById("Meal-time").value 
+        if(mealTime != "default")
+          templatePrompt2 += "These must be " + mealTime + "recipes";
+        var mealType = document.getElementById("Meal-type").value
+        if(mealType != "default")
+          templatePrompt2 += " for a " + mealType;
+        var mealDiff = document.getElementById("Difficulty").value
+        if(mealDiff != "default")
+          templatePrompt2 += " meant to be cooked by " + mealDiff;
+        var cookTime = document.getElementById("Cook-time").value
+        if(cookTime != "default")
+          templatePrompt2 += " that is made in " + cookTime;
+        var templatePrompt4 = ". One of these recipes must made with only the mentioned ingredients and nothing more. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
+        return await sendPrompt(templatePrompt1 + templatePrompt2 + text + templatePrompt4);
+      }
     </script>
 </body>
 </html>
