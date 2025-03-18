@@ -505,6 +505,15 @@
                 botMessage.className = 'message bot'; // Add 'bot' class for user messages
                 botMessage.textContent = result;
 
+                // Add an edit button to the message
+                const saveButton = document.createElement('button');
+                saveButton.className = 'edit-button';
+                saveButton.textContent = 'Save as PDF';
+                saveButton.addEventListener('click', function() {
+                    SaveRecipeAsPDF(botMessage);
+                });
+                botMessage.appendChild(saveButton);
+
                 // Append the new message to the chat area
                 chatMessages.appendChild(botMessage);
 
