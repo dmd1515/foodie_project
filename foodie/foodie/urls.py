@@ -22,7 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('upload/', views.upload_image, name='upload_image'),
-    path('send-message/', send_message, name='send_message'), 
+    path('send-message/', send_message, name='send_message'),
+    path('delete_uploaded_image/<int:image_id>/', views.delete_uploaded_image, name='delete_uploaded_image'), 
 ]
 
 

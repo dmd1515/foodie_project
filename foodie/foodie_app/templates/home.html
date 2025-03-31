@@ -634,6 +634,8 @@
             }
         });
 
+        let uploadedImageId = null; // Store the uploaded image ID
+
         document.getElementById("upload-form").addEventListener("submit", function (e) {
             e.preventDefault();
 
@@ -649,13 +651,15 @@
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.message) {
-                        alert(data.message); // Success message
-                        document.getElementById("upload-modal").style.display = "none"; // Close the modal
+                        alert(data.message);
+                        document.getElementById("upload-modal").style.display = "none"; 
 
-                        // Clear the file input
+                        // Store the uploaded image ID
+                        uploadedImageId = data.image_id; 
+
                         closeModal();
                     } else if (data.error) {
-                        alert(data.error); // Error message
+                        alert(data.error);
                     }
                 })
                 .catch((error) => {
@@ -664,23 +668,94 @@
                 });
         });
 
+        // Delete image when "X" is clicked
+        document.addEventListener("click", function () {
+            if (!uploadedImageId) {  // Prevent deletion if no image is uploaded
+                console.warn("No uploaded image to delete.");  // Debugging message
+                return;  // Stop execution
+            }
+
+            fetch(`/delete_uploaded_image/${uploadedImageId}/`, {  
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    document.getElementById("image-preview").style.display = "none";  
+                    document.getElementById("image-input").value = "";  
+                    uploadedImageId = null;  
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Something went wrong!");
+            });
+        });
+
         document.getElementById("image-input").addEventListener("change", function (event) {
             const file = event.target.files[0];
+            const chatInput = document.getElementById("chat-input");
             const preview = document.getElementById("image-preview");
 
             if (file && file.type.startsWith("image/")) {
+                // Show the image preview in the modal
                 const reader = new FileReader();
-
                 reader.onload = function (e) {
                     preview.src = e.target.result;
-                    preview.style.display = "block";
+                    preview.style.display = "block";  // Ensure the preview is visible
                 };
-
                 reader.readAsDataURL(file);
+
+                // Hide the textarea in chat input
+                chatInput.style.display = "none";
+
+                // Remove existing file name display if present
+                const existingFileNameDisplay = document.getElementById("file-name-display");
+                if (existingFileNameDisplay) {
+                    existingFileNameDisplay.remove();
+                }
+
+                // Create a container for file name and delete button
+                const fileNameContainer = document.createElement("div");
+                fileNameContainer.id = "file-name-display";
+                fileNameContainer.className = "file-name-container";
+
+                // Create a span to show the file name
+                const fileNameText = document.createElement("span");
+                fileNameText.textContent = file.name;
+                fileNameText.className = "file-name-text";
+
+                // Create a delete button (X) to remove the file
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "X";
+                deleteButton.className = "delete-file-button";
+                deleteButton.addEventListener("click", function () {
+                    fileNameContainer.remove();  // Remove the file name display
+                    chatInput.style.display = "block";  // Show the textarea again
+                    chatInput.value = "";  // Clear text input
+                    document.getElementById("image-input").value = "";  // Reset file input
+                    preview.src = "#";  // Clear the preview
+                    preview.style.display = "none";  // Hide the preview
+                });
+
+                // Append file name and delete button to the container
+                fileNameContainer.appendChild(fileNameText);
+                fileNameContainer.appendChild(deleteButton);
+
+                // Insert the container where the textarea was
+                chatInput.parentNode.insertBefore(fileNameContainer, chatInput);
             } else {
-                preview.style.display = "none";
+                preview.style.display = "none";  // Hide preview if no valid file
+                alert("Please upload a valid image file.");
             }
         });
+
 
         function closeModal() {
             const modal = document.getElementById("upload-modal");
