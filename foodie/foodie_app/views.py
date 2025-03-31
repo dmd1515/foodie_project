@@ -1,27 +1,58 @@
 from django.shortcuts import render, redirect
 from .models import TemporaryImage
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import ValidationError
+from PIL import Image
 from django.http import JsonResponse
 from .models import TemporaryImage
+import torch
+from io import BytesIO
+
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
 
-
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def upload_image(request):
     if request.method == "POST" and request.FILES.get("image"):
-        image = request.FILES["image"]
         try:
-            temp_image = TemporaryImage(image=image)
-            temp_image.full_clean()
+            # Just save temporarily, no processing
+            temp_image = TemporaryImage(image=request.FILES["image"])
             temp_image.save()
-            return JsonResponse({"message": "Image uploaded successfully!", "image_id": temp_image.id})
-        except ValidationError as e:
-            return JsonResponse({"error": str(e)}, status=400)
-    return redirect('home')
+            
+            return JsonResponse({
+                "status": "success",
+                "image_id": temp_image.id,
+                "message": "Image saved for processing"
+            })
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
-
+def detect_objects(request):
+    if request.method == "POST":
+        try:
+            image_id = request.POST.get("image_id")
+            temp_image = TemporaryImage.objects.get(id=image_id)
+            
+            # Actual YOLO processing
+            img = Image.open(temp_image.image)
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+                
+            results = model(img)
+            detections = results.pandas().xyxy[0]
+            detections = detections[detections['confidence'] > 0.4]
+            
+            detected_items = list(detections['name'].str.lower().unique())
+            
+            # Clean up
+            temp_image.delete()
+            
+            return JsonResponse({
+                "status": "success", 
+                "objects": detected_items
+            })
+            
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
 def delete_uploaded_image(request, image_id):
     if request.method == "DELETE":
         try:

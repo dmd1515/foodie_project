@@ -347,6 +347,17 @@
                 padding: 6px 12px;
                 font-size: 0.8rem;
             }
+            .message.user img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 4px;
+            margin-top: 5px;
+            display: block;
+            }
+
+            .message.user {
+                white-space: normal;
+            }
         }
     </style>
 </head>
@@ -454,79 +465,145 @@
             alert("Scan Object with Camera button clicked!");
             // Add logic to open the camera
         });
-
+        
+        // Modified Send button handler (NEW detection flow)
         document.getElementById('send-button').addEventListener('click', async function() {
             const chatInput = document.getElementById('chat-input');
             const chatMessages = document.getElementById('chat-messages');
-
-            // Get the message from the input
             const messageText = chatInput.value.trim();
-
-            // Check if the message is empty
-            if (!messageText) {
-                alert("Message cannot be empty."); // Show pop-up error message
-                return; // Stop further execution
+            
+            // Check if we have input
+            if (!messageText && !selectedImageFile) {
+                alert("Please enter a message or select an image.");
+                return;
             }
 
+            // Remove initial message if it exists
+            const initialMessage = document.getElementById('initial-message-1');
+            if (initialMessage) initialMessage.remove();
+
+            // Create user message (UNCHANGED image preview display)
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            
             if (messageText) {
-                // Remove initial messages if they exist
-                const initialMessage1 = document.getElementById('initial-message-1');
-                if (initialMessage1) {
-                    initialMessage1.remove(); // Remove the initial message
-                }
-
-                // Create a new message element
-                const newMessage = document.createElement('div');
-                newMessage.className = 'message user'; // Add 'user' class for user messages
-                newMessage.textContent = messageText;
-
-                // Add an edit button to the message
-                const editButton = document.createElement('button');
-                editButton.className = 'edit-button';
-                editButton.textContent = 'Edit';
-                editButton.addEventListener('click', function() {
-                    editMessage(newMessage);
-                });
-                newMessage.appendChild(editButton);
-
-                // Append the new message to the chat area
-                chatMessages.appendChild(newMessage);
-
-                // Clear the input field
-                chatInput.value = '';
-
-                // Reset the character counter
-                document.getElementById('char-count').textContent = '0';
-
-                // Scroll to the bottom of the chat area
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                var result = await sendUserPrompt(messageText)
-
-                                // Create a new message element
-                const botMessage = document.createElement('div');
-                botMessage.className = 'message bot'; // Add 'bot' class for user messages
-                botMessage.textContent = result;
-
-                // Add an edit button to the message
-                const saveButton = document.createElement('button');
-                saveButton.className = 'edit-button';
-                saveButton.textContent = 'Save as PDF';
-                saveButton.addEventListener('click', function() {
-                    SaveRecipeAsPDF(botMessage);
-                });
-                botMessage.appendChild(saveButton);
-
-                // Append the new message to the chat area
-                chatMessages.appendChild(botMessage);
-
-                // Clear the input field
-                chatInput.value = '';
-
-                // Reset the character counter
-                document.getElementById('char-count').textContent = '0';
+                userMessage.textContent = messageText;
             }
-});
+            
+            if (selectedImageFile) {
+                const imgPreview = document.createElement('img');
+                imgPreview.style.maxWidth = '200px';
+                imgPreview.style.maxHeight = '200px';
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imgPreview.src = e.target.result;
+                };
+                reader.readAsDataURL(selectedImageFile);
+                
+                userMessage.textContent = "Uploaded image:";
+                userMessage.appendChild(document.createElement('br'));
+                userMessage.appendChild(imgPreview);
+            }
+            
+            chatMessages.appendChild(userMessage);
+            chatInput.value = '';
+            document.getElementById('char-count').textContent = '0';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            let geminiResponse = "";
+            
+            // NEW: Process image only on Send button
+            if (selectedImageFile) {
+                try {
+                    // Show waiting message
+                    const waitingMsg = document.createElement('div');
+                    waitingMsg.className = 'message bot';
+                    waitingMsg.textContent = "⏳ Detecting objects in image...";
+                    chatMessages.appendChild(waitingMsg);
+
+                    // Temporary upload (no processing yet)
+                    const uploadForm = new FormData();
+                    uploadForm.append("image", selectedImageFile);
+                    const uploadResponse = await fetch("/upload/", {
+                        method: "POST",
+                        body: uploadForm,
+                        headers: {
+                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                        },
+                    });
+                    const uploadData = await uploadResponse.json();
+
+                    // Now trigger detection
+                    const detectForm = new FormData();
+                    detectForm.append("image_id", uploadData.image_id);
+                    const detectResponse = await fetch("/detect/", {
+                        method: "POST",
+                        body: detectForm,
+                        headers: {
+                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                        },
+                    });
+                    const detectData = await detectResponse.json();
+
+                    // Update waiting message
+                    waitingMsg.textContent = "✅ Detection complete!";
+
+                    if (detectData.objects && detectData.objects.length > 0) {
+                        // Show detected items
+                        const detectionMsg = document.createElement('div');
+                        detectionMsg.className = 'message bot';
+                        detectionMsg.textContent = "🔍 Detected: " + detectData.objects.join(", ");
+                        chatMessages.appendChild(detectionMsg);
+                        
+                        // Generate recipes
+                        geminiResponse = await sendUserPrompt(detectData.objects.join(", "));
+                    } else {
+                        const noItemsMsg = document.createElement('div');
+                        noItemsMsg.className = 'message bot';
+                        noItemsMsg.textContent = "❌ No objects detected. Try a different image.";
+                        chatMessages.appendChild(noItemsMsg);
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'message bot';
+                    errorMsg.textContent = "⚠️ Error: " + error.message;
+                    chatMessages.appendChild(errorMsg);
+                }
+                
+                // Clear image selection (but keep preview until send completes)
+                document.getElementById("image-input").value = "";
+                document.getElementById("chat-input").style.display = "block";
+            }
+            
+            // Process text prompt if entered
+            if (messageText) {
+                geminiResponse = await sendUserPrompt(messageText);
+            }
+            
+            // Display response
+            if (geminiResponse) {
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message bot';
+                botMessage.textContent = geminiResponse;
+                
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'edit-button';
+                saveBtn.textContent = 'Save as PDF';
+                saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
+                botMessage.appendChild(saveBtn);
+                
+                chatMessages.appendChild(botMessage);
+            }
+            
+            // Clear image preview after everything is done
+            document.getElementById("image-preview").style.display = "none";
+            const fileNameDisplay = document.getElementById("file-name-display");
+            if (fileNameDisplay) fileNameDisplay.remove();
+            selectedImageFile = null;
+            // Reset the character counter
+            document.getElementById('char-count').textContent = '0';
+        });
 
         // Edit message logic
         function editMessage(messageElement) {
@@ -641,32 +718,36 @@
 
             let formData = new FormData(this);
 
-            fetch("{% url 'upload_image' %}", {
+            fetch("/upload/", {
                 method: "POST",
                 body: formData,
                 headers: {
                     "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
                 },
             })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.message) {
-                        alert(data.message);
-                        document.getElementById("upload-modal").style.display = "none"; 
-
-                        // Store the uploaded image ID
-                        uploadedImageId = data.image_id; 
-
-                        closeModal();
-                    } else if (data.error) {
-                        alert(data.error);
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.message) {
+                    alert(data.message);
+                    // Process the detected objects
+                    if (data.objects && data.objects.length > 0) {
+                        data.objects.forEach(obj => {
+                            console.log(`Detected ${obj.class} with confidence ${obj.confidence}`);
+                        });
                     }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    alert("Something went wrong!");
-                });
+                } else if (data.error) {
+                    alert(data.error);
+                }
+
+                // Close the modal after image upload
+                closeModal(); // Call closeModal() after a successful image upload
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("Something went wrong!");
+            });
         });
+
 
         // Delete image when "X" is clicked
         document.addEventListener("click", function () {
@@ -697,22 +778,24 @@
                 alert("Something went wrong!");
             });
         });
+        let selectedImageFile = null;
 
-        document.getElementById("image-input").addEventListener("change", function (event) {
-            const file = event.target.files[0];
-            const chatInput = document.getElementById("chat-input");
+        // Image selection handler (UNCHANGED from original)
+        document.getElementById("image-input").addEventListener("change", function(event) {
+            selectedImageFile = event.target.files[0];
             const preview = document.getElementById("image-preview");
+            const chatInput = document.getElementById("chat-input");
 
-            if (file && file.type.startsWith("image/")) {
-                // Show the image preview in the modal
+            if (selectedImageFile && selectedImageFile.type.startsWith("image/")) {
+                // Show preview
                 const reader = new FileReader();
-                reader.onload = function (e) {
+                reader.onload = function(e) {
                     preview.src = e.target.result;
-                    preview.style.display = "block";  // Ensure the preview is visible
+                    preview.style.display = "block";
                 };
-                reader.readAsDataURL(file);
-
-                // Hide the textarea in chat input
+                reader.readAsDataURL(selectedImageFile);
+                
+                // Hide text input when image is selected
                 chatInput.style.display = "none";
 
                 // Remove existing file name display if present
@@ -728,31 +811,28 @@
 
                 // Create a span to show the file name
                 const fileNameText = document.createElement("span");
-                fileNameText.textContent = file.name;
+                fileNameText.textContent = selectedImageFile.name;
                 fileNameText.className = "file-name-text";
 
                 // Create a delete button (X) to remove the file
                 const deleteButton = document.createElement("button");
                 deleteButton.textContent = "X";
                 deleteButton.className = "delete-file-button";
-                deleteButton.addEventListener("click", function () {
-                    fileNameContainer.remove();  // Remove the file name display
-                    chatInput.style.display = "block";  // Show the textarea again
-                    chatInput.value = "";  // Clear text input
-                    document.getElementById("image-input").value = "";  // Reset file input
-                    preview.src = "#";  // Clear the preview
-                    preview.style.display = "none";  // Hide the preview
+                deleteButton.addEventListener("click", function() {
+                    fileNameContainer.remove();
+                    chatInput.style.display = "block";
+                    document.getElementById("image-input").value = "";
+                    preview.style.display = "none";
+                    selectedImageFile = null;
                 });
 
-                // Append file name and delete button to the container
                 fileNameContainer.appendChild(fileNameText);
                 fileNameContainer.appendChild(deleteButton);
-
-                // Insert the container where the textarea was
                 chatInput.parentNode.insertBefore(fileNameContainer, chatInput);
             } else {
-                preview.style.display = "none";  // Hide preview if no valid file
-                alert("Please upload a valid image file.");
+                preview.style.display = "none";
+                selectedImageFile = null;
+                chatInput.style.display = "block";
             }
         });
 

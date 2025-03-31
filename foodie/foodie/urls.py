@@ -24,6 +24,7 @@ urlpatterns = [
     path('upload/', views.upload_image, name='upload_image'),
     path('send-message/', send_message, name='send_message'),
     path('delete_uploaded_image/<int:image_id>/', views.delete_uploaded_image, name='delete_uploaded_image'), 
+    path('detect/', views.detect_objects, name='detect_objects'),
 ]
 
 
