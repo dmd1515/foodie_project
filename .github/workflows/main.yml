@@ -1,0 +1,43 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - master
+      - "feature/*"
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Python environment (priklauso nuo tavo naudojamo framework'o)
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # Run tests (jei naudoji pytest, pakeisk pagal savo testavimo įrankį)
+      - name: Run tests
+        run: |
+          pytest tests/
+
+      # (Nepasirinktinai) Pateikti testų rezultatus kaip artefaktus
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: tests/
