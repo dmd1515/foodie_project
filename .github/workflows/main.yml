@@ -9,6 +9,7 @@ on:
     branches:
       - main
 
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -18,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Python environment (priklauso nuo tavo naudojamo framework'o)
+      # Set up Python environment (based on your framework)
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -29,15 +30,15 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      # Run tests (jei naudoji pytest, pakeisk pagal savo testavimo įrankį)
+      # Run tests and generate junit test results
       - name: Run tests
         run: |
-          pytest tests/
+          pytest --junitxml=results.xml tests/
 
-      # (Nepasirinktinai) Pateikti testų rezultatus kaip artefaktus
+      # Upload test results as artifact
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: tests/
+          path: results.xml
