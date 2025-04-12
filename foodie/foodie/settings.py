@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'foodie.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 TESTING = 'test' in os.getenv('DJANGO_ENV', '')
-print(TESTING)
+
 DATABASES = {
     #'default': {
     #    'ENGINE': 'django.db.backends.sqlite3',
