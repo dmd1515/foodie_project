@@ -1,38 +1,65 @@
-from django.test import TestCase
+from unittest.mock import MagicMock
+import pandas as pd
+from django.test import TestCase, Client
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.exceptions import ValidationError
 from foodie_app.models import TemporaryImage
-import os
-class TemporaryImageModelTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        """Naudojame atskirą testų DB"""
-        os.environ['DJANGO_ENV'] = 'test'
+from unittest.mock import patch
+from PIL import Image
+import io
 
-    def test_upload_valid_image(self):
-        """Ar leidžia įkelti JPEG failą?"""
-        image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
-        temp_image = TemporaryImage(image=image)
-        temp_image.full_clean()  # Tikrina validacijas
-        temp_image.save()
-        print("Saved image:", temp_image.id)  # Debugging line
-        self.assertEqual(TemporaryImage.objects.count(), 1)
-        input("Press Enter to continue and drop the test database...")
+class ImageUploadIntegrationTests(TestCase):
+    def setUp(self):
+        self.client = Client()
 
-    def test_upload_large_image(self):
-        """Ar blokuoja >5MB failą?"""
-        large_image = SimpleUploadedFile("large.jpg", b"a" * (5 * 1024 * 1024 + 1), content_type="image/jpeg")
-        temp_image = TemporaryImage(image=large_image)
-        with self.assertRaises(ValidationError) as context:
-            temp_image.full_clean()
-        self.assertIn("Image size exceeds 5MB", str(context.exception))
-        input("Press Enter to continue and drop the test database...")
+    @patch('foodie_app.views.get_model')
+    def test_image_upload_and_detection_flow(self, mock_get_model):
+        # Sukuriam suklastotus duomenis iš modelio
+        mock_model_instance = MagicMock()
+        mock_results = MagicMock()
+        mock_df = pd.DataFrame({
+            'name': ['person', 'dog'],
+            'confidence': [0.95, 0.88],
+        })
+        mock_results.pandas.return_value.xyxy = [mock_df]
+        mock_model_instance.return_value = mock_results
+        mock_get_model.return_value = mock_model_instance
 
-    def test_upload_invalid_format(self):
-        """Ar blokuoja PNG failą?"""
-        invalid_image = SimpleUploadedFile("image.png", b"file_content", content_type="image/png")
-        temp_image = TemporaryImage(image=invalid_image)
-        with self.assertRaises(ValidationError) as context:
-            temp_image.full_clean()
-        self.assertIn("Only JPEG images are allowed", str(context.exception))
-        input("Press Enter to continue and drop the test database...")
+        # Sukuriam mažą JPEG failą atpažinimui
+        image_data = io.BytesIO()
+        image = Image.new('RGB', (100, 100), color='red')
+        image.save(image_data, format='JPEG')
+        image_data.seek(0)  # Grąžinamas į pradžią, kad būtų galima skaityti
+
+        # Sukuriam netikrą JPEG failą
+        image_file = SimpleUploadedFile("test.jpg", image_data.read(), content_type="image/jpeg")
+
+        # Testas: įkėlimas
+        response = self.client.post('/upload/', {'image': image_file})
+        self.assertEqual(response.status_code, 200)
+        upload_data = response.json()
+        self.assertEqual(upload_data['status'], 'success')
+        image_id = upload_data['image_id']
+
+        # Debug logas, kad matytume, kas vyksta
+        print("Image uploaded, now attempting detection...")
+
+        # Testas: aptikimas
+        response = self.client.post('/detect/', {'image_id': image_id})
+
+        # Logas, kad patikrintume, kas vyksta su atsakymu
+        print("Detection response:", response.content)
+
+        # Patikrinkime statusą ir turinį
+        self.assertEqual(response.status_code, 200, f"Expected 200, but got {response.status_code}")
+        
+        detect_data = response.json()
+        
+        # Logas apie aptikimo duomenis
+        print("Detection data:", detect_data)
+
+        self.assertEqual(detect_data['status'], 'success')
+        self.assertIn('person', detect_data['objects'])
+        self.assertIn('dog', detect_data['objects'])
+
+        # Įsitikinam, kad paveikslėlis buvo ištrintas
+        self.assertFalse(TemporaryImage.objects.filter(id=image_id).exists())

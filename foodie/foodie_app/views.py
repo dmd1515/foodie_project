@@ -10,7 +10,13 @@ from io import BytesIO
 def home(request):
     return render(request, 'home.html')
 
-model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+_model = None
+
+def get_model():
+    global _model
+    if _model is None:
+        _model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+    return _model
 def upload_image(request):
     if request.method == "POST" and request.FILES.get("image"):
         try:
@@ -37,7 +43,7 @@ def detect_objects(request):
             if img.mode != 'RGB':
                 img = img.convert('RGB')
                 
-            results = model(img)
+            results = get_model()(img)
             detections = results.pandas().xyxy[0]
             detections = detections[detections['confidence'] > 0.4]
             
