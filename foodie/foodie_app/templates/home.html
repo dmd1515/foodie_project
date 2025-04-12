@@ -465,8 +465,7 @@
             alert("Scan Object with Camera button clicked!");
             // Add logic to open the camera
         });
-        
-        // Modified Send button handler (NEW detection flow)
+
         document.getElementById('send-button').addEventListener('click', async function() {
             const chatInput = document.getElementById('chat-input');
             const chatMessages = document.getElementById('chat-messages');
@@ -487,123 +486,64 @@
             userMessage.className = 'message user';
             
             if (messageText) {
-                userMessage.textContent = messageText;
-            }
-            
-            if (selectedImageFile) {
-                const imgPreview = document.createElement('img');
-                imgPreview.style.maxWidth = '200px';
-                imgPreview.style.maxHeight = '200px';
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imgPreview.src = e.target.result;
-                };
-                reader.readAsDataURL(selectedImageFile);
-                
-                userMessage.textContent = "Uploaded image:";
-                userMessage.appendChild(document.createElement('br'));
-                userMessage.appendChild(imgPreview);
-            }
-            
-            chatMessages.appendChild(userMessage);
-            chatInput.value = '';
-            document.getElementById('char-count').textContent = '0';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            let geminiResponse = "";
-            
-            // NEW: Process image only on Send button
-            if (selectedImageFile) {
-                try {
-                    // Show waiting message
-                    const waitingMsg = document.createElement('div');
-                    waitingMsg.className = 'message bot';
-                    waitingMsg.textContent = "⏳ Detecting objects in image...";
-                    chatMessages.appendChild(waitingMsg);
-
-                    // Temporary upload (no processing yet)
-                    const uploadForm = new FormData();
-                    uploadForm.append("image", selectedImageFile);
-                    const uploadResponse = await fetch("/upload/", {
-                        method: "POST",
-                        body: uploadForm,
-                        headers: {
-                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
-                        },
-                    });
-                    const uploadData = await uploadResponse.json();
-
-                    // Now trigger detection
-                    const detectForm = new FormData();
-                    detectForm.append("image_id", uploadData.image_id);
-                    const detectResponse = await fetch("/detect/", {
-                        method: "POST",
-                        body: detectForm,
-                        headers: {
-                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
-                        },
-                    });
-                    const detectData = await detectResponse.json();
-
-                    // Update waiting message
-                    waitingMsg.textContent = "✅ Detection complete!";
-
-                    if (detectData.objects && detectData.objects.length > 0) {
-                        // Show detected items
-                        const detectionMsg = document.createElement('div');
-                        detectionMsg.className = 'message bot';
-                        detectionMsg.textContent = "🔍 Detected: " + detectData.objects.join(", ");
-                        chatMessages.appendChild(detectionMsg);
-                        
-                        // Generate recipes
-                        geminiResponse = await sendUserPrompt(detectData.objects.join(", "));
-                    } else {
-                        const noItemsMsg = document.createElement('div');
-                        noItemsMsg.className = 'message bot';
-                        noItemsMsg.textContent = "❌ No objects detected. Try a different image.";
-                        chatMessages.appendChild(noItemsMsg);
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'message bot';
-                    errorMsg.textContent = "⚠️ Error: " + error.message;
-                    chatMessages.appendChild(errorMsg);
+                // Remove initial messages if they exist
+                const initialMessage1 = document.getElementById('initial-message-1');
+                if (initialMessage1) {
+                    initialMessage1.remove(); // Remove the initial message
                 }
-                
-                // Clear image selection (but keep preview until send completes)
-                document.getElementById("image-input").value = "";
-                document.getElementById("chat-input").style.display = "block";
-            }
-            
-            // Process text prompt if entered
-            if (messageText) {
-                geminiResponse = await sendUserPrompt(messageText);
-            }
-            
-            // Display response
-            if (geminiResponse) {
+
+                // Create a new message element
+                const newMessage = document.createElement('div');
+                newMessage.className = 'message user'; // Add 'user' class for user messages
+                newMessage.textContent = messageText;
+
+                // Add an edit button to the message
+                const editButton = document.createElement('button');
+                editButton.className = 'edit-button';
+                editButton.textContent = 'Edit';
+                editButton.addEventListener('click', function() {
+                    editMessage(newMessage);
+                });
+                newMessage.appendChild(editButton);
+
+                // Append the new message to the chat area
+                chatMessages.appendChild(newMessage);
+
+                // Clear the input field
+                chatInput.value = '';
+
+                // Reset the character counter
+                document.getElementById('char-count').textContent = '0';
+
+                // Scroll to the bottom of the chat area
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                var result = await sendUserPrompt(messageText)
+
+                                // Create a new message element
                 const botMessage = document.createElement('div');
-                botMessage.className = 'message bot';
-                botMessage.textContent = geminiResponse;
-                
-                const saveBtn = document.createElement('button');
-                saveBtn.className = 'edit-button';
-                saveBtn.textContent = 'Save as PDF';
-                saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
-                botMessage.appendChild(saveBtn);
-                
+                botMessage.className = 'message bot'; // Add 'bot' class for user messages
+                botMessage.textContent = result;
+
+                // Add an edit button to the message
+                const saveButton = document.createElement('button');
+                saveButton.className = 'edit-button';
+                saveButton.textContent = 'Save as PDF';
+                saveButton.addEventListener('click', function() {
+                    SaveRecipeAsPDF(botMessage);
+                });
+                botMessage.appendChild(saveButton);
+
+                // Append the new message to the chat area
                 chatMessages.appendChild(botMessage);
+
+                // Clear the input field
+                chatInput.value = '';
+
+                // Reset the character counter
+                document.getElementById('char-count').textContent = '0';
             }
-            
-            // Clear image preview after everything is done
-            document.getElementById("image-preview").style.display = "none";
-            const fileNameDisplay = document.getElementById("file-name-display");
-            if (fileNameDisplay) fileNameDisplay.remove();
-            selectedImageFile = null;
-            // Reset the character counter
-            document.getElementById('char-count').textContent = '0';
-        });
+});
 
         // Edit message logic
         function editMessage(messageElement) {
