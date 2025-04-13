@@ -1,4 +1,4 @@
-name: RecipeGenerator build and test pipeline (test the pipeline first /# 1)
+name: RecipeGenerator build and test pipeline (test the pipeline first /# 2)
 
 on:
   push:
@@ -18,3 +18,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: test recipe generation
+        run: pytest > test_rez.txt
+          cat test_rez.txt 
