@@ -25,5 +25,4 @@ jobs:
           pip install pytest
 
       - name: test recipe generation
-        run: pytest > test_rez.txt
-          test_rez.txt 
+        run: pytest > echo
