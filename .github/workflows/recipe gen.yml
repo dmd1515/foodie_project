@@ -17,7 +17,7 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.11'
 #default directory yra /home/runner/work/foodie_project , kas yra $GITHUB_WORKSPACE
       - name: setup python packages
         run: |
