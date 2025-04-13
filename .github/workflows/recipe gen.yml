@@ -22,7 +22,7 @@ jobs:
       - name: setup python packages
         run: |
           python -m pip install --upgrade pip
-          pip install -r foodie/requirements.txt
+          pip install pytest
 
       - name: test recipe generation
         run: pytest > test_rez.txt
