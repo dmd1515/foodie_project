@@ -26,4 +26,4 @@ jobs:
 
       - name: test recipe generation
         run: pytest > test_rez.txt
-          cat test_rez.txt 
+          test_rez.txt 
