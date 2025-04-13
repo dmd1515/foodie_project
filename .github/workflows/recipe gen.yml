@@ -20,5 +20,6 @@ jobs:
           python-version: '3.12'
 
       - name: test recipe generation
+        usage: pytest
         run: pytest > test_rez.txt
           cat test_rez.txt 
