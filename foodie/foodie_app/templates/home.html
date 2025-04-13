@@ -1,166 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Foodie - Chat Layout</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>    </script>
     <style>
-      /* Global Styles */
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        height: 100vh;
-        overflow: hidden;
-      }
-      /* Modal styles */
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-      }
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-      .modal-content {
-        background-color: #fff;
-        margin: 10% auto;
-        padding: 20px;
-        border-radius: 8px;
-        width: 300px;
-        text-align: center;
-      }
+        /* Error message styles */
+        .error-message {
+            color: #dc3545; /* Raudona spalva */
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none; /* Paslėptas pagal nutylėjimą */
+        }
 
-      /* File input and preview styles */
-      .file-input-container {
-        margin-bottom: 20px;
-      }
+        .error-message.visible {
+            display: block; /* Rodyti, kai yra klaida */
+        }
 
-      #image-input {
-        display: none; /* Hide the default file input */
-      }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
 
-      #image-preview {
-        max-width: 100%;
-        max-height: 150px;
-        border-radius: 8px;
-        margin-top: 10px;
-      }
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+        }
 
-      /* Button styles */
-      .button-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-      }
+        /* File input and preview styles */
+        .file-input-container {
+            margin-bottom: 20px;
+        }
 
-      .upload-button,
-      .close-modal {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1rem;
-        flex: 1;
-      }
+        #image-input {
+            display: none; /* Hide the default file input */
+        }
 
-      .upload-button {
-        background-color: #007bff; /* Blue color */
-        color: #fff;
-      }
+        #image-preview {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
 
-      .upload-button:hover {
-        background-color: #0056b3; /* Darker blue on hover */
-      }
+        /* Button styles */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
 
-      .close-modal {
-        background-color: #6c757d; /* Gray color */
-        color: #fff;
-      }
+        .upload-button,
+        .close-modal {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            flex: 1;
+        }
 
-      .close-modal:hover {
-        background-color: #5a6268; /* Darker gray on hover */
-      }
+        .upload-button {
+            background-color: #007bff; /* Blue color */
+            color: #fff;
+        }
 
-      /* Sidebar Styles */
-      .sidebar {
-        width: 250px;
-        background-color: #000; /* Juodas fonas */
-        color: #fff;
-        padding: 20px;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Centruojame turinį horizontaliai */
-      }
+        .upload-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
 
-      .sidebar h1 {
-        font-size: 2rem;
-        margin-bottom: 20px;
-        text-transform: uppercase; /* Pavadinimas didžiosiomis raidėmis */
-        text-align: center; /* Centruojame tekstą */
-        color: #fff; /* Baltas tekstas */
-      }
+        .close-modal {
+            background-color: #6c757d; /* Gray color */
+            color: #fff;
+        }
 
-      .sidebar ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        width: 100%; /* Užima visą plotį */
-      }
+        .close-modal:hover {
+            background-color: #5a6268; /* Darker gray on hover */
+        }
 
-      .sidebar ul li {
-        margin-bottom: 10px;
-      }
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #000; /* Juodas fonas */
+            color: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centruojame turinį horizontaliai */
+        }
 
-      .sidebar ul li a {
-        color: #fff;
-        text-decoration: none;
-        font-size: 1rem;
-        display: block;
-        padding: 10px;
-        border-radius: 4px;
-        transition: background-color 0.3s;
-      }
+        .sidebar h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-transform: uppercase; /* Pavadinimas didžiosiomis raidėmis */
+            text-align: center; /* Centruojame tekstą */
+            color: #fff; /* Baltas tekstas */
+        }
 
-      .sidebar ul li a:hover {
-        background-color: #333; /* Tamsesnis atspalvis užvedus */
-      }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%; /* Užima visą plotį */
+        }
 
-      /* Main Content Styles */
-      .main-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        background-color: #f4f4f4;
-        padding: 20px;
-        overflow-y: auto;
-      }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
 
-      .chat-area {
-        flex: 1;
-        background-color: #fff;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        overflow-y: auto;
-      }
+        .sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            display: block;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            border: 2px solid #fff; /* Baltas apvadas */
+        }
 
-      .chat-area h2 {
-        font-size: 1.2rem;
-        margin-bottom: 20px;
-      }
+        .sidebar ul li a:hover {
+            background-color: #333; /* Tamsesnis atspalvis užvedus */
+        }
 
-      .chat-messages {
-        margin-bottom: 20px;
-      }
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f4f4f4;
+            padding: 20px;
+            overflow-y: auto;
+        }
 
+        .chat-area {
+            flex: 1;
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow-y: auto;
+        }
+
+        .chat-area h2 {
+            font-size: 2rem; /* Padidintas šrifto dydis */
+            margin-bottom: 20px;
+            text-align: center; /* Centruojame tekstą */
+        }
+
+        .chat-messages {
+            margin-bottom: 20px;
+        }
+
+        .chat-messages .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            max-width: 70%;
+            position: relative;
+            word-wrap: break-word; /* Allow long words to break and wrap */
+            white-space: pre-wrap; /* Preserve new lines and wrap text */
+        }
+
+        .chat-messages .message.user {
+            background-color: #007bff;
+            color: #fff;
+            margin-left: auto; /* Align to the right */
+        }
+
+        .chat-messages .message.bot {
+            background-color: #e9ecef;
+            margin-right: auto; /* Align to the left */
+        }
+
+        .chat-messages .message .edit-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .chat-messages .message.user .edit-button {
+            color: #fff;
+        }
+
+        .chat-messages .message.bot .edit-button {
+            color: #000;
+        }
       .chat-messages .message {
         margin-bottom: 10px;
         padding: 10px;
@@ -169,264 +227,474 @@
         white-space: pre;
       }
 
-      .chat-input-container {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        background-color: #fff;
-        padding: 10px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .chat-input-container textarea {
-        flex: 1;
-        padding: 10px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        resize: none;
-        font-size: 1rem;
-      }
-
-      .chat-input-container button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        background-color: #007bff;
-        color: #fff;
-        cursor: pointer;
-        font-size: 1rem;
-      }
-
-      .chat-input-container button:hover {
-        background-color: #0056b3;
-      }
-
-      .chat-input-container .photo-buttons {
-        display: flex;
-        gap: 10px;
-      }
-
-      .chat-input-container .photo-buttons button {
-        background-color: #28a745;
-      }
-
-      .chat-input-container .photo-buttons button:hover {
-        background-color: #218838;
-      }
-
-      /* Responsive Design */
-      @media (max-width: 768px) {
-        .sidebar {
-          width: 200px;
-        }
-
-        .sidebar h1 {
-          font-size: 1.5rem;
-        }
-
-        .sidebar ul li a {
-          font-size: 0.9rem;
-        }
-
-        .chat-area h2 {
-          font-size: 1rem;
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .chat-input-container textarea {
-          font-size: 0.9rem;
+            flex: 1;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            resize: none;
+            font-size: 1rem;
         }
 
         .chat-input-container button {
-          padding: 8px 16px;
-          font-size: 0.9rem;
-        }
-      }
-
-      @media (max-width: 480px) {
-        .sidebar {
-          width: 150px;
-        }
-
-        .sidebar h1 {
-          font-size: 1.2rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
         }
 
-        .sidebar ul li a {
-          font-size: 0.8rem;
+        .chat-input-container button:hover {
+            background-color: #0056b3;
         }
 
-        .chat-area h2 {
-          font-size: 0.9rem;
+        .chat-input-container .photo-buttons {
+            display: flex;
+            gap: 10px;
         }
 
-        .chat-input-container textarea {
-          font-size: 0.8rem;
+        .chat-input-container .photo-buttons button {
+            background-color: #28a745;
         }
 
-        .chat-input-container button {
-          padding: 6px 12px;
-          font-size: 0.8rem;
+        .chat-input-container .photo-buttons button:hover {
+            background-color: #218838;
         }
-      }
+
+        .char-counter {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .clear-chat-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #dc3545;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .clear-chat-button:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .sidebar h1 {
+                font-size: 1.5rem;
+            }
+
+            .sidebar ul li a {
+                font-size: 0.9rem;
+            }
+
+            .chat-area h2 {
+                font-size: 1.5rem; /* Mažesnis šrifto dydis mažesniuose ekranuose */
+            }
+
+            .chat-input-container textarea {
+                font-size: 0.9rem;
+            }
+
+            .chat-input-container button {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 150px;
+            }
+
+            .sidebar h1 {
+                font-size: 1.2rem;
+            }
+
+            .sidebar ul li a {
+                font-size: 0.8rem;
+            }
+
+            .chat-area h2 {
+                font-size: 1.2rem; /* Dar mažesnis šrifto dydis labai mažuose ekranuose */
+            }
+
+            .chat-input-container textarea {
+                font-size: 0.8rem;
+            }
+
+            .chat-input-container button {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <!-- Sidebar -->
     <div class="sidebar">
-      <h1>FOODIE</h1>
-      <!-- Pavadinimas didžiosiomis raidėmis -->
-      <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Recipes</a></li>
-      </ul>
+        <h1>FOODIE</h1>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Recipes</a></li>
+        </ul>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-      <div class="chat-area">
-        <h2>Chat</h2>
-        <div id="chat-messages" class="chat-messages">
-          <div class="message">Hello! How can I help you today?</div>
-          <div class="message">I need help with my food order.</div>
+        <div class="chat-area">
+            <h2>Chat with Foodie</h2> <!-- Pakeistas tekstas ir stilius -->
+            <div class="chat-messages" id="chat-messages">
+                <!-- Example messages -->
+                <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
+            </div>
         </div>
-      </div>
 
-      <!-- Chat Input and Buttons -->
-      <div class="chat-input-container">
-        <textarea id=prompt-area placeholder="Type your message..."></textarea>
-        <div class="photo-buttons">
-          <button id="add-photo-button">Add Photo</button>
-          <button id="scan-camera-button">Scan Object with Camera</button>
+        <!-- Chat Input and Buttons -->
+        <div class="chat-input-container">
+            <textarea id="chat-input" placeholder="Type your message..." maxlength="300"></textarea>
+            <div> 
+              <select name="Meal time" id="Meal-time">
+                <option value="default", selected="selected">Any time</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Night">Night snack</option>
+              </select>
+              <select name="Meal type" id="Meal-type">
+                <option value="default", selected="selected">Any type</option>
+                <option value="Main dish">Main dish</option>
+                <option value="Side dish">Side dish</option>
+                <option value="Desert">Desert</option>
+                <option value="Soup">Soup</option>
+                <option value="non-Alcohol drink">Alcohol-free drink</option>
+                <option value="Alcohol drink">Alcohol drink</option>
+              </select>
+              <select name="Difficulty" id="Difficulty">
+                <option value="default", selected="selected">Any difficulty</option>
+                <option value="Beginners">Beginner</option>
+                <option value="Intermediates">Intermediate</option>
+                <option value="Experts">Expert</option>
+              </select>
+              <select name="Cook time" id="Cook-time">
+                <option value="default", selected="selected">Any cook time</option>
+                <option value="Less than 10 min">Less than 10 min.</option>
+                <option value="Less than 30 min">Less than 30 min.</option>
+                <option value="Less than 1 h">Less than 1 h.</option>
+                <option value="More than 1 h">Longer than 1h.</option>
+              </select>
+            </div>
+            <div class="photo-buttons">
+                <button id="add-photo-button">Add Photo</button>
+                <button id="scan-camera-button">Scan Object with Camera</button>
+            </div>
+            <button id="send-button">Send</button>
         </div>
-        <button id="send-button">Send</button>
-      </div>
+        <!-- Character Counter -->
+        <div class="char-counter">
+            <span id="char-count">0</span>/300
+        </div>
+        <!-- Error Messages -->
+        <div id="limit-error" class="error-message">You have reached the maximum character limit (300).</div>
+
+        <!-- Clear Chat Button -->
+        <button class="clear-chat-button" id="clear-chat-button">Clear Chat</button>
     </div>
     <!-- Modal Structure -->
     <div id="upload-modal" class="modal">
-      <div class="modal-content">
-        <h4>Upload Photo</h4>
-        <form
-          id="upload-form"
-          action="{% url 'upload_image' %}"
-          method="POST"
-          enctype="multipart/form-data"
-        >
-          {% csrf_token %}
-          <!-- File input and image preview -->
-          <div class="file-input-container">
-            <input
-              type="file"
-              id="image-input"
-              name="image"
-              accept="image/jpeg"
-              required
-            />
-            <label for="image-input" class="upload-button">Choose Photo</label>
-            <img
-              id="image-preview"
-              src="#"
-              alt="Preview"
-              style="display: none"
-            />
-          </div>
-          <!-- Upload and close buttons -->
-          <div class="button-container">
-            <button type="submit" class="upload-button">Upload</button>
-            <button type="button" class="close-modal">Close</button>
-          </div>
-        </form>
-      </div>
+        <div class="modal-content">
+            <h4>Upload Photo</h4>
+            <form id="upload-form" action="{% url 'upload_image' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- File input and image preview -->
+                <div class="file-input-container">
+                    <input type="file" id="image-input" name="image" accept="image/jpeg" required />
+                    <label for="image-input" class="upload-button">Choose Photo</label>
+                    <img id="image-preview" src="#" alt="Preview" style="display: none" />
+                </div>
+                <!-- Upload and close buttons -->
+                <div class="button-container">
+                    <button type="submit" class="upload-button">Upload</button>
+                    <button type="button" class="close-modal">Close</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <script type="module">
+    <script type="module" >
             import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-ai";
             console.log("GoogleGenerativeAI loaded:", GoogleGenerativeAI);
-      // JavaScript for handling button clicks
-      document
-        .getElementById("add-photo-button")
-        .addEventListener("click", function () {
-          document.getElementById("upload-modal").style.display = "flex"; // Open the modal
+        // JavaScript for handling button clicks
+        document.getElementById("add-photo-button").addEventListener("click", function () {
+            document.getElementById("upload-modal").style.display = "flex"; // Open the modal
         });
 
-      document
-        .querySelector(".close-modal")
-        .addEventListener("click", closeModal);
+        document.querySelector(".close-modal").addEventListener("click", closeModal);
 
-      document
-        .getElementById("scan-camera-button")
-        .addEventListener("click", function () {
-          alert("Scan Object with Camera button clicked!");
-          // Add logic to open the camera
+        document.getElementById("scan-camera-button").addEventListener("click", function () {
+            alert("Scan Object with Camera button clicked!");
+            // Add logic to open the camera
         });
 
-      document
-        .getElementById("send-button")
-        .addEventListener("click", sendUserPrompt);
-      document
-        .getElementById("upload-form")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
+        document.getElementById('send-button').addEventListener('click', async function() {
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
 
-          let formData = new FormData(this);
+            // Get the message from the input
+            const messageText = chatInput.value.trim();
 
-          fetch("{% url 'upload_image' %}", {
-            method: "POST",
-            body: formData,
-            headers: {
-              "X-CSRFToken": document.querySelector(
-                "[name=csrfmiddlewaretoken]"
-              ).value,
-            },
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.message) {
-                alert(data.message); // Success message
-                document.getElementById("upload-modal").style.display = "none"; // Close the modal
+            // Check if the message is empty
+            if (!messageText) {
+                alert("Message cannot be empty."); // Show pop-up error message
+                return; // Stop further execution
+            }
 
-                // Clear the file input
-                closeModal();
-              } else if (data.error) {
-                alert(data.error); // Error message
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              alert("Something went wrong!");
+            if (messageText) {
+                // Remove initial messages if they exist
+                const initialMessage1 = document.getElementById('initial-message-1');
+                if (initialMessage1) {
+                    initialMessage1.remove(); // Remove the initial message
+                }
+
+                // Create a new message element
+                const newMessage = document.createElement('div');
+                newMessage.className = 'message user'; // Add 'user' class for user messages
+                newMessage.textContent = messageText;
+
+                // Add an edit button to the message
+                const editButton = document.createElement('button');
+                editButton.className = 'edit-button';
+                editButton.textContent = 'Edit';
+                editButton.addEventListener('click', function() {
+                    editMessage(newMessage);
+                });
+                newMessage.appendChild(editButton);
+
+                // Append the new message to the chat area
+                chatMessages.appendChild(newMessage);
+
+                // Clear the input field
+                chatInput.value = '';
+
+                // Reset the character counter
+                document.getElementById('char-count').textContent = '0';
+
+                // Scroll to the bottom of the chat area
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                var result = await sendUserPrompt(messageText)
+
+                                // Create a new message element
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message bot'; // Add 'bot' class for user messages
+                botMessage.textContent = result;
+
+                // Add an edit button to the message
+                const saveButton = document.createElement('button');
+                saveButton.className = 'edit-button';
+                saveButton.textContent = 'Save as PDF';
+                saveButton.addEventListener('click', function() {
+                    SaveRecipeAsPDF(botMessage);
+                });
+                botMessage.appendChild(saveButton);
+
+                // Append the new message to the chat area
+                chatMessages.appendChild(botMessage);
+
+                // Clear the input field
+                chatInput.value = '';
+
+                // Reset the character counter
+                document.getElementById('char-count').textContent = '0';
+            }
+});
+
+        // Edit message logic
+        function editMessage(messageElement) {
+            const messageText = messageElement.textContent.replace('Edit', '').trim();
+            const editInput = document.createElement('textarea');
+            editInput.value = messageText;
+            editInput.style.width = '100%';
+            editInput.style.height = '60px';
+            editInput.style.marginBottom = '10px';
+            editInput.maxLength = 300; // Set max length for the textarea
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save';
+            saveButton.style.backgroundColor = '#28a745';
+            saveButton.style.color = '#fff';
+            saveButton.style.border = 'none';
+            saveButton.style.padding = '5px 10px';
+            saveButton.style.borderRadius = '4px';
+            saveButton.style.cursor = 'pointer';
+
+            const editCharCounter = document.createElement('div');
+            editCharCounter.className = 'char-counter';
+            editCharCounter.innerHTML = `<span id="edit-char-count">${messageText.length}</span>/300`;
+
+            // Replace message content with input, counter, and save button
+            messageElement.innerHTML = '';
+            messageElement.appendChild(editInput);
+            messageElement.appendChild(editCharCounter);
+            messageElement.appendChild(saveButton);
+
+            // Update character counter while editing
+            editInput.addEventListener('input', function() {
+                const currentLength = editInput.value.length;
+                document.getElementById('edit-char-count').textContent = currentLength;
+
+                // Optional: Change color if approaching the limit
+                if (currentLength >= 280) {
+                    editCharCounter.style.color = 'red';
+                } else {
+                    editCharCounter.style.color = '#666';
+                }
             });
+
+            // Save the edited message
+            saveButton.addEventListener('click', function() {
+                const newText = editInput.value.trim();
+                if (newText) {
+                    messageElement.textContent = newText;
+                    const editButton = document.createElement('button');
+                    editButton.className = 'edit-button';
+                    editButton.textContent = 'Edit';
+                    editButton.addEventListener('click', function() {
+                        editMessage(messageElement);
+                    });
+                    messageElement.appendChild(editButton);
+                }
+            });
+        }
+
+        function SaveRecipeAsPDF(messageElement) {
+          const doc = new jsPDF();
+          const text = messageElement.textContent;
+  
+          doc.setFontSize(8);
+          doc.text(text, 10, 10);
+          // force download
+          doc.save('Recipe.pdf');
+        }
+
+        // Clear chat logic
+        document.getElementById('clear-chat-button').addEventListener('click', function() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = `
+                <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
+            `;
         });
-      document
-        .getElementById("image-input")
-        .addEventListener("change", function (event) {
-          const file = event.target.files[0];
-          const preview = document.getElementById("image-preview");
 
-          if (file && file.type.startsWith("image/")) {
-            const reader = new FileReader();
+        // Character counter logic
+        const textarea = document.getElementById('chat-input');
+        const charCount = document.getElementById('char-count');
+        const limitError = document.getElementById('limit-error');
 
-            reader.onload = function (e) {
-              preview.src = e.target.result;
-              preview.style.display = "block";
-            };
+        // Initialize the counter with the current length of the textarea
+        charCount.textContent = textarea.value.length;
 
-            reader.readAsDataURL(file);
-          } else {
-            preview.style.display = "none";
-          }
+        textarea.addEventListener('input', function() {
+            const currentLength = textarea.value.length;
+            charCount.textContent = currentLength;
+
+            // Show/hide the character limit error message
+            if (currentLength >= 300) {
+                limitError.classList.add('visible');
+                setTimeout(() => {
+                    limitError.classList.remove('visible'); // Hide after 5 seconds
+                }, 5000); // 5000 milliseconds = 5 seconds
+            } else {
+                limitError.classList.remove('visible');
+            }
+
+            // Optional: Change color if approaching the limit
+            if (currentLength >= 280) {
+                charCount.style.color = 'red';
+            } else {
+                charCount.style.color = '#666';
+            }
         });
-      function closeModal() {
-        const modal = document.getElementById("upload-modal");
-        const fileInput = document.getElementById("image-input");
-        const imagePreview = document.getElementById("image-preview");
 
-        // Reset the file input and clear the preview
-        fileInput.value = ""; // Clear the file input
-        imagePreview.src = "#"; // Clear the image preview
-        imagePreview.style.display = "none"; // Hide the preview
+        document.getElementById("upload-form").addEventListener("submit", function (e) {
+            e.preventDefault();
 
-        // Hide the modal
-        modal.style.display = "none";
-      }
+            let formData = new FormData(this);
+
+            fetch("{% url 'upload_image' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.message) {
+                        alert(data.message); // Success message
+                        document.getElementById("upload-modal").style.display = "none"; // Close the modal
+
+                        // Clear the file input
+                        closeModal();
+                    } else if (data.error) {
+                        alert(data.error); // Error message
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("Something went wrong!");
+                });
+        });
+
+        document.getElementById("image-input").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById("image-preview");
+
+            if (file && file.type.startsWith("image/")) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = "none";
+            }
+        });
+
+        function closeModal() {
+            const modal = document.getElementById("upload-modal");
+            const fileInput = document.getElementById("image-input");
+            const imagePreview = document.getElementById("image-preview");
+
+            // Reset the file input and clear the preview
+            fileInput.value = ""; // Clear the file input
+            imagePreview.src = "#"; // Clear the image preview
+            imagePreview.style.display = "none"; // Hide the preview
+
+            // Hide the modal
+            modal.style.display = "none";
+        }
 
       async function sendPrompt(userPrompt){
         const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RGYzNWd2SWVzT01XTFJJeHB3blFuOUc1MEpJOVpsTkNz"));
@@ -435,23 +703,27 @@
         
         const result = await model.generateContent(prompt);
         console.log(result.response.text());
-        return result;
+        return result.response.text();
       }
 
-      async function addMessage(text){
-        var message = document.createElement('div');
-        message.classList.add("message")
-        message.textContent = text;
-        document.getElementById("chat-messages").appendChild(message);  
-      }
-
-      async function sendUserPrompt() {
-        addMessage("You entered: " + document.getElementById("prompt-area").value)
+      async function sendUserPrompt(text) {
         var templatePrompt1 = "Generate 3 recipes using these ingredients: ";
-        var templatePrompt2 = ". One of these recipes must made with only the mentioned ingredients and nothing more. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
-        var result = await sendPrompt(templatePrompt1 + document.getElementById("prompt-area").value + templatePrompt2);
-        addMessage(result.response.text())
+        var templatePrompt2 = ". "
+        var mealTime = document.getElementById("Meal-time").value 
+        if(mealTime != "default")
+          templatePrompt2 += "These must be " + mealTime + "recipes";
+        var mealType = document.getElementById("Meal-type").value
+        if(mealType != "default")
+          templatePrompt2 += " for a " + mealType;
+        var mealDiff = document.getElementById("Difficulty").value
+        if(mealDiff != "default")
+          templatePrompt2 += " meant to be cooked by " + mealDiff;
+        var cookTime = document.getElementById("Cook-time").value
+        if(cookTime != "default")
+          templatePrompt2 += " that is made in " + cookTime;
+        var templatePrompt4 = ". One of these recipes must made with only the mentioned ingredients and nothing more. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
+        return await sendPrompt(templatePrompt1 + templatePrompt2 + text + templatePrompt4);
       }
     </script>
-  </body>
+</body>
 </html>

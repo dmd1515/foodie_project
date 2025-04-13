@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,6 +74,8 @@ WSGI_APPLICATION = 'foodie.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+TESTING = 'test' in os.getenv('DJANGO_ENV', '')
+
 DATABASES = {
     #'default': {
     #    'ENGINE': 'django.db.backends.sqlite3',
@@ -81,7 +83,7 @@ DATABASES = {
     #}
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'foodie_db',  
+        'NAME': 'foodie_db_test' if TESTING else 'foodie_db',  
         'CLIENT': {
             'host': 'mongodb://localhost:27017/',  # MongoDB connection URL
         }
