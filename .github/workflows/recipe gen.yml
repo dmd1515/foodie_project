@@ -24,5 +24,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r foodie/requirements.txt
 
+      - name: do some checks
+        run: |
+          echo "PYTHONPATH=$GITHUB_WORKSPACE/foodie"
+          $GITHUB_WORKSPACE
       - name: test recipe generation
         run: pytest
