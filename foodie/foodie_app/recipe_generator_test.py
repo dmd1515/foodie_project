@@ -1,5 +1,5 @@
 import unittest
-from foodie_app.recipeGeneretro import sendPrompt
+from recipeGeneretro import sendPrompt
 
 class TestStringMethods(unittest.TestCase):
 
