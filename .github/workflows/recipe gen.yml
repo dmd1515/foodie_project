@@ -1,4 +1,4 @@
-name: RecipeGenerator build and test pipeline
+name: RecipeGenerator build and test pipeline (test the pipeline first /# 1)
 
 on:
   push:
