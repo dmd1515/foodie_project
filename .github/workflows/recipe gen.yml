@@ -19,7 +19,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: setup python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       - name: test recipe generation
-        uses: pytest
         run: pytest > test_rez.txt
           cat test_rez.txt 
