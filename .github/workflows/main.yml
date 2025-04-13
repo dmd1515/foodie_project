@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - "feature-*"
+      - unitTest
   pull_request:
     branches:
       - main
