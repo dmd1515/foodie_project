@@ -18,15 +18,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-#default directory yra /home/runner/work/foodie_project
+#default directory yra /home/runner/work/foodie_project , kas yra $GITHUB_WORKSPACE
       - name: setup python packages
         run: |
           python -m pip install --upgrade pip
           pip install -r foodie/requirements.txt
 
-      - name: do some checks
-        run: |
-          echo "PYTHONPATH=$GITHUB_WORKSPACE/foodie"
-          $GITHUB_WORKSPACE
       - name: test recipe generation
-        run: pytest
+        run: PYTHONPATH=$GITHUB_WORKSPACE/foodie pytest
