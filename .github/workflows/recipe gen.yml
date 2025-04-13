@@ -25,4 +25,4 @@ jobs:
           pip install pytest
 
       - name: test recipe generation
-        run: pytest > echo
+        run: pytest
