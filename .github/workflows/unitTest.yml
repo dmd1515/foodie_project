@@ -21,9 +21,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ./foodie  # Install in editable mode
           pip install -r foodie/requirements.txt
           pip install pytest pytest-django
+          pip install pytest
 
       - name: Start MongoDB
         run: |
@@ -45,4 +45,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: foodie/test-results.txt
+          path: test-results.txt
