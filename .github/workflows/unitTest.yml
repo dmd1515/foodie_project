@@ -27,6 +27,7 @@ jobs:
 
       - name: Run tests
         run: |
+          export DJANGO_SETTINGS_MODULE=foodie.settings
           PYTHONPATH=$GITHUB_WORKSPACE/foodie python -m pytest | tee test-results.txt
 
       - name: Save test results
