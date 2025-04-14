@@ -37,11 +37,12 @@ jobs:
           done
 
       - name: Run tests
+        working-directory: ./foodie # Add this line
         run: |
-          PYTHONPATH=$GITHUB_WORKSPACE/foodie python -m pytest | tee test-results.txt
+          PYTHONPATH=$GITHUB_WORKSPACE pytest | tee test-results.txt
 
       - name: Save test results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: test-results.txt
+          path: foodie/test-results.txt
