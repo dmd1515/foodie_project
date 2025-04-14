@@ -412,6 +412,7 @@
             // Add logic to open the camera
         });
 
+        // Send message logic
         document.getElementById('send-button').addEventListener('click', function() {
             const chatInput = document.getElementById('chat-input');
             const chatMessages = document.getElementById('chat-messages');
@@ -428,8 +429,10 @@
             if (messageText) {
                 // Remove initial messages if they exist
                 const initialMessage1 = document.getElementById('initial-message-1');
-                if (initialMessage1) {
-                    initialMessage1.remove(); // Remove the initial message
+                const initialMessage2 = document.getElementById('initial-message-2');
+                if (initialMessage1 && initialMessage2) {
+                    initialMessage1.remove();
+                    initialMessage2.remove();
                 }
 
                 // Create a new message element
@@ -458,7 +461,7 @@
                 // Scroll to the bottom of the chat area
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-});
+        });
 
         // Edit message logic
         function editMessage(messageElement) {
@@ -494,7 +497,7 @@
                 const currentLength = editInput.value.length;
                 document.getElementById('edit-char-count').textContent = currentLength;
 
-                // Optional: Change color if approaching the limit
+                //Change color if approaching the limit
                 if (currentLength >= 280) {
                     editCharCounter.style.color = 'red';
                 } else {
@@ -523,6 +526,7 @@
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = `
                 <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
+                <div class="message bot" id="initial-message-2">I need help with my food order.</div>
             `;
         });
 
