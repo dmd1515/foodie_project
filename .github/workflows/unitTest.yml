@@ -36,6 +36,16 @@ jobs:
           pip install -r foodie/requirements.txt
           pip install pytest pytest-django
           pip install pytest
+
+      - name: Wait for MongoDB to be ready
+        run: |
+          echo "Waiting for MongoDB to be ready..."
+          while ! curl --silent --fail localhost:27017; do
+            echo "Waiting for MongoDB to be available..."
+            sleep 5
+          done
+          echo "MongoDB is ready!"
+
       - name: Display MongoDB Logs
         run: docker logs $(docker ps -q --filter "ancestor=mongo:latest")
 
