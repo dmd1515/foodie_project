@@ -51,7 +51,7 @@ class ImageUploadIntegrationTests(TestCase):
 
         # Testas: aptikimas
         response = self.client.post('/detect/', {'image_id': image_id})
-
+ 
         # Logas, kad patikrintume, kas vyksta su atsakymu
         print("Detection response:", response.content)
 
