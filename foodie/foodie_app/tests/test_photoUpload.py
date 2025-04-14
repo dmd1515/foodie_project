@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from foodie_app.models import TemporaryImage
 from unittest.mock import patch
 from PIL import Image
+from foodie_app.views import get_model
 import io
 class ImageUploadIntegrationTests(TestCase):
     def setUp(self):
@@ -12,16 +13,22 @@ class ImageUploadIntegrationTests(TestCase):
 
     @patch("foodie_app.views.get_model")
     def test_image_upload_and_detection_flow(self, mock_get_model):
-        # Sukuriam suklastotus duomenis iš modelio
-        mock_model_instance = MagicMock()
-        mock_results = MagicMock()
+        # Set up fake detection DataFrame
         mock_df = pd.DataFrame({
             'name': ['person', 'dog'],
             'confidence': [0.95, 0.88],
         })
+
+        # Mock results object with .pandas().xyxy[0]
+        mock_results = MagicMock()
         mock_results.pandas.return_value.xyxy = [mock_df]
-        mock_model_instance.return_value = mock_results
-        mock_get_model.return_value = mock_model_instance
+
+        # Mock model — when called with an image, returns mock_results
+        mock_model = MagicMock()
+        mock_model.return_value = mock_results
+
+        # Mock get_model to return the mocked model
+        mock_get_model.return_value = mock_model
 
         # Sukuriam mažą JPEG failą atpažinimui
         image_data = io.BytesIO()
