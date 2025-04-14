@@ -31,11 +31,11 @@ jobs:
           DJANGO_SETTINGS_MODULE: foodie.settings
         run: |
           cd foodie
-          pytest foodie_app/tests.py::MessageTests -v --junitxml=test-res.xml
-          cat test-res.xml
+          pytest foodie_app/tests.py::MessageTests -v --junitxml=test-rez.xml
+          cat test-rez.xml
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
-          name: text-input-test-res
-          path: foodie/test-res.xml
+          name: text-input-test-rez
+          path: foodie/test-rez.xml
