@@ -24,7 +24,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r foodie/requirements.txt
       - name: run test
-        run: PYTHONPATH=$GITHUB_WORKSPACE/foodie/foodie_app pytest > test-results.txt
+        run: PYTHONPATH=$GITHUB_WORKSPACE/foodie pytest > test-results.txt
 
       - name: Save test results
         uses: actions/upload-artifact@v4

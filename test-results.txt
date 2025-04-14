@@ -1,0 +1,20 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.3.5, pluggy-1.5.0
+rootdir: /Users/deimanteburbaite/foodie_project
+plugins: anyio-4.9.0, django-4.10.0
+collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+_________ ERROR collecting foodie/foodie_app/tests/test_photoUpload.py _________
+ImportError while importing test module '/Users/deimanteburbaite/foodie_project/foodie/foodie_app/tests/test_photoUpload.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/importlib/__init__.py:127: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+foodie/foodie_app/tests/test_photoUpload.py:5: in <module>
+    from foodie_app.models import TemporaryImage
+E   ModuleNotFoundError: No module named 'foodie_app'
+=========================== short test summary info ============================
+ERROR foodie/foodie_app/tests/test_photoUpload.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.83s ===============================
