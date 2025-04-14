@@ -1,10 +1,11 @@
 ============================= test session starts ==============================
 platform darwin -- Python 3.9.6, pytest-8.3.5, pluggy-1.5.0
 django: version: 3.1.12, settings: foodie.settings (from env)
-rootdir: /Users/deimanteburbaite/foodie_project/foodie
+rootdir: /Users/deimanteburbaite/foodie_project
+configfile: pytest.ini
 plugins: anyio-4.9.0, django-4.10.0
 collected 1 item
 
 foodie_app/tests/test_photoUpload.py .                                   [100%]
 
-============================== 1 passed in 2.81s ===============================
+============================== 1 passed in 5.62s ===============================

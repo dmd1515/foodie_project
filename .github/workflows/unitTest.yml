@@ -9,7 +9,15 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
-
+    services:
+      mongo:
+        image: mongo:latest
+        options: --health-cmd "curl --silent --fail localhost:27017 || exit 1" --health-interval 10s --health-timeout 5s --health-retries 5
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: example
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -29,6 +37,7 @@ jobs:
       - name: Run tests
         run: |
           export DJANGO_SETTINGS_MODULE=foodie.settings
+          export MONGO_URI=mongodb://root:example@localhost:27017  # Set the MongoDB URI for your Django settings
           PYTHONPATH=$GITHUB_WORKSPACE/foodie python -m pytest | tee test-results.txt
 
       - name: Save test results
