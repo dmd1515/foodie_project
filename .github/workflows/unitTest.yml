@@ -3,7 +3,7 @@ name: uniTest pipeline
 on:
   push:
     branches:
-      - uniTest
+      - unitTest
 
 jobs:
   build:
