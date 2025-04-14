@@ -37,8 +37,8 @@ jobs:
           done
 
       - name: Run tests
-        working-directory: ./foodie # Add this line
         run: |
+          cd foodie
           PYTHONPATH=$GITHUB_WORKSPACE pytest | tee test-results.txt
 
       - name: Save test results
