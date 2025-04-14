@@ -54,7 +54,7 @@ class ImageUploadIntegrationTests(TestCase):
         
         detect_data = response.json()
         
-        # Logas apie aptikimo duomenis
+        # Logas apie aptikimo duomenis 
         print("Detection data:", detect_data)
 
         self.assertEqual(detect_data['status'], 'success')
