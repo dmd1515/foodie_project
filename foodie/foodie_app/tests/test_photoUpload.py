@@ -11,7 +11,7 @@ class ImageUploadIntegrationTests(TestCase):
     def setUp(self):
         self.client = Client()
 
-    @patch('foodie_app.views.get_model')
+    @patch('foodie_app.views.detect_objects.get_model')
     def test_image_upload_and_detection_flow(self, mock_get_model):
         # Sukuriam suklastotus duomenis iš modelio
         mock_model_instance = MagicMock()
