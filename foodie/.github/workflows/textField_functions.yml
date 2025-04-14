@@ -1,4 +1,4 @@
-name: Text Field Validation CI
+name: Home Screen CI
 
 on:
   push:
