@@ -35,10 +35,9 @@ jobs:
             echo "Waiting for MongoDB to start..."
             sleep 2
           done
-
       - name: Run tests
+        working-directory: ./foodie
         run: |
-          cd foodie
           PYTHONPATH=$GITHUB_WORKSPACE pytest | tee test-results.txt
 
       - name: Save test results
