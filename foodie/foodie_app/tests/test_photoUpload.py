@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from foodie_app.models import TemporaryImage
 from unittest.mock import patch
 from PIL import Image
+from foodie.foodie_app.views import get_model  # or whatever the correct path is
 import io
 class ImageUploadIntegrationTests(TestCase):
     def setUp(self):
