@@ -27,7 +27,7 @@ jobs:
 
       - name: Run tests
         run: |
-          PYTHONPATH=$GITHUB_WORKSPACE/foodie python -m pytest > test-results.txt
+          PYTHONPATH=$GITHUB_WORKSPACE/foodie python -m pytest | tee test-results.txt
 
       - name: Save test results
         uses: actions/upload-artifact@v4
