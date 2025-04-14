@@ -1,10 +1,3 @@
-name: uniTest pipeline
-
-on:
-  push:
-    branches:
-      - unitTest
-
 jobs:
   build:
     name: build
@@ -25,8 +18,16 @@ jobs:
           pip install pytest pytest-django
           pip install pytest
 
-      - name: Wait for MongoDB
-        run: sleep 10
+      - name: Start MongoDB
+        run: |
+          docker run --name mongodb -d -p 27017:27017 mongo:latest
+
+      - name: Wait for MongoDB to be ready
+        run: |
+          until nc -zv localhost 27017; do
+            echo "Waiting for MongoDB to start..."
+            sleep 2
+          done
 
       - name: Run tests
         run: |
