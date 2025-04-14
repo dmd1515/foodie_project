@@ -12,7 +12,7 @@ jobs:
 
     services:
       mongo:
-        image: mongo:latest
+        image: mongo:5.0 # Try using a specific version of MongoDB
         options: --health-cmd "curl --silent --fail localhost:27017 || exit 1" --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 27017:27017
@@ -47,7 +47,9 @@ jobs:
           echo "MongoDB is ready!"
 
       - name: Display MongoDB Logs
-        run: docker logs $(docker ps -q --filter "ancestor=mongo:latest")
+        run: |
+          echo "MongoDB Logs:"
+          docker logs $(docker ps -q --filter "ancestor=mongo:5.0")  # Updated to use a specific version
 
       - name: Run tests
         run: |
