@@ -38,8 +38,8 @@ jobs:
 
       - name: Run tests
         run: |
-          cd foodie  # Change to the foodie directory
-          python -m pytest foodie_app/tests/test_photoUpload.py -v | tee test-results.txt
+          cd foodie
+          PYTHONPATH=$GITHUB_WORKSPACE python -m pytest foodie_app/tests/test_photoUpload.py -v | tee test-results.txt
 
       - name: Save test results
         uses: actions/upload-artifact@v4
