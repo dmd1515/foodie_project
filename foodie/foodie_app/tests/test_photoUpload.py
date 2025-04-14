@@ -6,16 +6,11 @@ from foodie_app.models import TemporaryImage
 from unittest.mock import patch
 from PIL import Image
 import io
-
-try:
-    from ..views import get_model  # Relative import
-except (ImportError, ValueError):
-    from foodie.foodie_app.views import get_model
 class ImageUploadIntegrationTests(TestCase):
     def setUp(self):
         self.client = Client()
 
-    @patch('foodie.foodie_app.views.get_model')
+    @patch('foodie_app.views.get_model')
     def test_image_upload_and_detection_flow(self, mock_get_model):
         # Sukuriam suklastotus duomenis iš modelio
         mock_model_instance = MagicMock()
