@@ -1,0 +1,7 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.0, pytest-8.3.5, pluggy-1.5.0
+rootdir: /Users/titasmac/Documents/foodie_project/foodie
+plugins: anyio-4.9.0, django-4.11.1
+collected 0 items
+
+============================ no tests ran in 0.02s =============================
