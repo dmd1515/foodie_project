@@ -12,12 +12,16 @@ jobs:
     services:
       mongo:
         image: mongo:latest
-        options: --health-cmd "mongosh --eval 'db.serverStatus()'" --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 27017:27017
         env:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: example
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.serverStatus().ok'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -33,6 +37,9 @@ jobs:
           pip install -r foodie/requirements.txt
           pip install pytest pytest-django
           pip install pytest
+
+      - name: Wait for MongoDB
+        run: sleep 10
 
       - name: Run tests
         env:
