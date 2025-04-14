@@ -38,8 +38,7 @@ jobs:
 
       - name: Run tests
         run: |
-          cd foodie
-          PYTHONPATH=$GITHUB_WORKSPACE python -m pytest foodie_app/tests/test_photoUpload.py -v | tee test-results.txt
+          run: PYTHONPATH=$GITHUB_WORKSPACE/foodie pytest > test-results.txt
 
       - name: Save test results
         uses: actions/upload-artifact@v4
