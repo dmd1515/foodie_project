@@ -12,7 +12,7 @@ jobs:
 
     services:
       mongo:
-        image: mongo:5.0 # Try using a specific version of MongoDB
+        image: mongo:4.4 # Trying an older stable version
         options: --health-cmd "curl --silent --fail localhost:27017 || exit 1" --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 27017:27017
@@ -37,6 +37,15 @@ jobs:
           pip install pytest pytest-django
           pip install pytest
 
+      - name: Display Docker Info
+        run: docker info
+
+      - name: Display MongoDB Logs
+        run: |
+          echo "MongoDB Logs:"
+          docker ps -a  # Check all running containers
+          docker logs $(docker ps -q --filter "ancestor=mongo:4.4")  # Show logs of Mongo container
+
       - name: Wait for MongoDB to be ready
         run: |
           echo "Waiting for MongoDB to be ready..."
@@ -45,11 +54,6 @@ jobs:
             sleep 5
           done
           echo "MongoDB is ready!"
-
-      - name: Display MongoDB Logs
-        run: |
-          echo "MongoDB Logs:"
-          docker logs $(docker ps -q --filter "ancestor=mongo:5.0")  # Updated to use a specific version
 
       - name: Run tests
         run: |
