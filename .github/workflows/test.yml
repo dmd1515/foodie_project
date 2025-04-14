@@ -26,8 +26,11 @@ jobs:
           pip install pytest
 
       - name: Run tests
+        env:
+        DJANGO_SETTINGS_MODULE: foodie.settings
+        PYTHONPATH: ${{ github.workspace }}/foodie
         run: |
-          PYTHONPATH=$GITHUB_WORKSPACE/foodie python -m pytest | tee test-results.txt
+          python -m pytest foodie/foodie_app/tests/test.py -v | tee test-results.txt
 
       - name: Save test results
         uses: actions/upload-artifact@v4
