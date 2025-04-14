@@ -1,7 +1,10 @@
 import unittest
 from foodie_app.recipeGeneretro import sendPrompt, formatPrompt
+from django.test import TestCase, Client
 
-class TestStringMethods(unittest.TestCase):
+class TestStringMethods(TestCase):
+    def setUp(self):
+        self.client = Client()
 
     def testRecipeGeneration(self):
         testPrompt = formatPrompt("milk, eggs, bacon")
