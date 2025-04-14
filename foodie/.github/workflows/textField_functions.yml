@@ -1,0 +1,52 @@
+name: Text Field Validation CI
+
+on:
+  push:
+    branches:
+      - foodie-homesScreen
+
+jobs:
+  build-and-test:
+    name: Build and Test Text Field Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r foodie/requirements.txt
+          pip install pytest pytest-django
+
+      - name: Run Text Field Tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}/foodie
+          DJANGO_SETTINGS_MODULE: foodie.settings
+        run: |
+          pytest foodie/foodie_app/tests.py -v --junitxml=test-results.xml
+          cat test-results.xml
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: text-field-test-results
+          path: test-res.xml
+
+      - name: Verify Test Coverage
+        run: |
+          cd foodie
+          pytest --cov=foodie_app --cov-report=term-missing
+          coverage xml
+          
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: foodie/coverage.xml
