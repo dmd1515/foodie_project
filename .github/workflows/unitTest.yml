@@ -6,13 +6,12 @@ on:
       - unitTest
 
 jobs:
-  build:
-    name: build
+  start-mongo:
+    name: Start MongoDB
     runs-on: ubuntu-latest
-
     services:
       mongo:
-        image: mongo:4.4 # Trying an older stable version
+        image: mongo:4.4
         options: --health-cmd "curl --silent --fail localhost:27017 || exit 1" --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 27017:27017
@@ -20,6 +19,11 @@ jobs:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: example
           MONGO_INITDB_DATABASE: foodie_db_test
+
+  build:
+    name: Build & Test
+    needs: start-mongo # Ensure MongoDB is ready before running tests
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
@@ -36,24 +40,6 @@ jobs:
           pip install -r foodie/requirements.txt
           pip install pytest pytest-django
           pip install pytest
-
-      - name: Display Docker Info
-        run: docker info
-
-      - name: Display MongoDB Logs
-        run: |
-          echo "MongoDB Logs:"
-          docker ps -a  # Check all running containers
-          docker logs $(docker ps -q --filter "ancestor=mongo:4.4")  # Show logs of Mongo container
-
-      - name: Wait for MongoDB to be ready
-        run: |
-          echo "Waiting for MongoDB to be ready..."
-          while ! curl --silent --fail localhost:27017; do
-            echo "Waiting for MongoDB to be available..."
-            sleep 5
-          done
-          echo "MongoDB is ready!"
 
       - name: Run tests
         run: |
