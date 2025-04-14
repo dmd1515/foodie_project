@@ -1,3 +1,10 @@
+name: uniTest pipeline
+
+on:
+  push:
+    branches:
+      - unitTest
+
 jobs:
   build:
     name: build
