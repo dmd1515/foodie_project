@@ -85,7 +85,8 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'foodie_db_test' if TESTING else 'foodie_db',  
         'CLIENT': {
-            'host': 'mongodb://localhost:27017/',  # MongoDB connection URL
+            'host': 'mongodb://localhost:27017/', 
+             'port': int(os.getenv('MONGO_PORT', 27017)), # MongoDB connection URL
         }
     }
 }
