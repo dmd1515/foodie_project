@@ -7,6 +7,10 @@ from unittest.mock import patch
 from PIL import Image
 import io
 
+try:
+    from ..views import get_model  # Relative import
+except (ImportError, ValueError):
+    from foodie.foodie_app.views import get_model
 class ImageUploadIntegrationTests(TestCase):
     def setUp(self):
         self.client = Client()
