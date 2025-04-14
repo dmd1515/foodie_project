@@ -1,17 +1,23 @@
 import unittest
-from foodie_app.recipeGeneretro import sendPrompt
+from foodie_app.recipeGeneretro import sendPrompt, formatPrompt
 
 class TestStringMethods(unittest.TestCase):
 
     def testRecipeGeneration(self):
-        testPrompt = "Reply by writing only five /'a/' characters without an endline character"
+        testPrompt = formatPrompt("milk, eggs, bacon")
+        self.assertIn("milk,", testPrompt.split())
         replyMessege = sendPrompt(testPrompt)
-        self.assertEqual(replyMessege, "aaaaa\n")
+        self.assertTrue(replyMessege)
 
-    def testMilkshake(self):
-        testPrompt = "Reply by writing only the first line of the song milkshake by kelis"
+    def testRecipeGenerationWithConditionals(self):
+        testPrompt = formatPrompt("milk, eggs, bacon", "dinner", "dessert", "beginner", "less than 1h")
+        self.assertIn("milk,", testPrompt.split())
+        self.assertIn("dinner", testPrompt.split())
+        self.assertIn("dessert", testPrompt.split())
+        self.assertIn("beginner", testPrompt.split())
+        self.assertIn("less", testPrompt.split())
         replyMessege = sendPrompt(testPrompt)
-        self.assertEqual(replyMessege.lower(), "my milkshake brings all the boys to the yard\n")
+        self.assertTrue(replyMessege)
 
 if __name__ == '__main__':
     unittest.main()
