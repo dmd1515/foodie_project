@@ -1,4 +1,4 @@
-name: TextField tests
+name:  TextField tests
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Run Django Tests
+    name: build
     runs-on: ubuntu-latest
 
     steps:
@@ -23,19 +23,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r foodie/requirements.txt
-          pip install pytest pytest-django
+          pip install pytest
 
       - name: Run tests
-        env:
-          DJANGO_SETTINGS_MODULE: foodie.settings
-          PYTHONPATH: ${{ github.workspace }}
         run: |
-          cd foodie
-          python -m pytest foodie_app/tests/test.py -v --junitxml=test-results.xml
-          cat test-results.xml
+          PYTHONPATH=$GITHUB_WORKSPACE/foodie python -m pytest foodie/foodie_app/tests/test.py -v | tee test-results.txt
 
-      - name: Upload test results
+      - name: Save test results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: foodie/test-results.xml
+          path: test-results.txt
