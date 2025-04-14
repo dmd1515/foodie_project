@@ -1,23 +1,19 @@
-name: Test Workflow Visibility
+
 name:  TextField tests
  
-on: [push]
- on:
+
+on:
    push:
      branches:
        - feature-homesScreen
  
- jobs:
+jobs:
    test:
    build:
      name: build
      runs-on: ubuntu-latest
  
      steps:
-       - run: echo "Hello World"
-       - name: Checkout Code
-         uses: actions/checkout@v4
- 
        - name: Setup Python
          uses: actions/setup-python@v5
          with:
