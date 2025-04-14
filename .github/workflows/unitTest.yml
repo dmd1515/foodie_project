@@ -21,9 +21,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -e ./foodie  # Install in editable mode
           pip install -r foodie/requirements.txt
           pip install pytest pytest-django
-          pip install pytest
 
       - name: Start MongoDB
         run: |
@@ -38,10 +38,11 @@ jobs:
 
       - name: Run tests
         run: |
-          PYTHONPATH=$GITHUB_WORKSPACE/foodie python -m pytest | tee test-results.txt
+          cd foodie  # Change to the foodie directory
+          python -m pytest foodie_app/tests/test_photoUpload.py -v | tee test-results.txt
 
       - name: Save test results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: test-results.txt
+          path: foodie/test-results.txt
