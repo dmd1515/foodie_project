@@ -19,9 +19,9 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: example
         options: >-
           --health-cmd "mongosh --quiet --eval 'db.serverStatus().ok'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
+          --health-interval 15s
+          --health-timeout 10s
+          --health-retries 20
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -38,16 +38,22 @@ jobs:
           pip install pytest pytest-django
           pip install pytest
 
-      - name: Wait for MongoDB
-        run: sleep 10
+      - name: Install dockerize
+        run: |
+          curl -sSL https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-0.6.1.tar.gz | tar -xz
+          sudo mv dockerize /usr/local/bin/
+
+      - name: Wait for MongoDB to be ready
+        run: dockerize -wait tcp://mongo:27017 -timeout 60s
 
       - name: Run tests
         env:
           DJANGO_SETTINGS_MODULE: foodie.settings
-          MONGO_HOST: localhost
+          MONGO_HOST: mongo
           MONGO_PORT: 27017
           MONGO_USER: root
           MONGO_PASSWORD: example
+          TESTING: true
         run: |
           PYTHONPATH=$GITHUB_WORKSPACE/foodie python -m pytest | tee test-results.txt
 
