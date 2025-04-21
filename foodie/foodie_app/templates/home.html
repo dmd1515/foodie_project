@@ -501,12 +501,23 @@
                 // Scroll to the bottom of the chat area
                 chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                var result = await sendUserPrompt(messageText)
+                var result = await sendUserPrompt(messageText);
 
-                                // Create a new message element
+                addBotMessage(chatMessages, result);
+
+                // Clear the input field
+                chatInput.value = '';
+
+                // Reset the character counter
+                document.getElementById('char-count').textContent = '0';
+            }
+});
+
+        function addBotMessage(chat, messageContent){
+                            // Create a new message element
                 const botMessage = document.createElement('div');
                 botMessage.className = 'message bot'; // Add 'bot' class for user messages
-                botMessage.textContent = result;
+                botMessage.textContent = messageContent;
 
                 // Add an edit button to the message
                 const saveButton = document.createElement('button');
@@ -518,18 +529,11 @@
                 botMessage.appendChild(saveButton);
 
                 // Append the new message to the chat area
-                chatMessages.appendChild(botMessage);
-
-                // Clear the input field
-                chatInput.value = '';
-
-                // Reset the character counter
-                document.getElementById('char-count').textContent = '0';
-            }
-});
+                chat.appendChild(botMessage);
+        }
 
         // Edit message logic
-        function editMessage(messageElement) {
+        async function editMessage(messageElement) {
             const messageText = messageElement.textContent.replace('Edit', '').trim();
             const editInput = document.createElement('textarea');
             editInput.value = messageText;
@@ -571,7 +575,7 @@
             });
 
             // Save the edited message
-            saveButton.addEventListener('click', function() {
+            saveButton.addEventListener('click', async function() {
                 const newText = editInput.value.trim();
                 if (newText) {
                     messageElement.textContent = newText;
@@ -582,6 +586,10 @@
                         editMessage(messageElement);
                     });
                     messageElement.appendChild(editButton);
+
+                    var result = await sendUserPrompt(newText);
+                    const chat = document.getElementById('chat-messages');
+                    addBotMessage(chat, result);
                 }
             });
         }
