@@ -1,4 +1,4 @@
-#!/Users/titasmac/Documents/foodie_project/foodie/venv/bin/python3
+#!/Users/deimanteburbaite/foodie_project/foodie/venv/bin/python3.13
 # -*- coding: utf-8 -*-
 import re
 import sys
