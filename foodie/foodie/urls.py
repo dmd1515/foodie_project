@@ -32,6 +32,7 @@ urlpatterns = [
     path('detect/', views.detect_objects, name='detect_objects'),
     path('delete_account/', views.delete_account, name='delete_account'),
     path('save-recipe/', views.save_generated_recipe, name='save_recipe'),
+    path('my-recipes/', views.my_recipes, name='my_recipes'),
 ]
 
 

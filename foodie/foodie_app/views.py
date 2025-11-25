@@ -118,3 +118,8 @@ def save_generated_recipe(request):
     )
 
     return JsonResponse({'success': True, 'id': obj.id})
+
+@login_required
+def my_recipes(request):
+    recipes = GeneratedRecipe.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'accounts/my_recipes.html', {'recipes': recipes})
