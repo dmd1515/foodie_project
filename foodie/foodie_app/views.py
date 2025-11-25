@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from .models import TemporaryImage
+from .models import GeneratedRecipe
 from PIL import Image
 from django.http import JsonResponse
 from .models import TemporaryImage
 import torch
 from io import BytesIO
-
-# Create your views here.
-def home(request):
-    return render(request, 'home.html')
+from .forms import CustomUserCreationForm                   # ✅ use this
 
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def upload_image(request):
@@ -82,5 +82,45 @@ def send_message(request):
     # Jei užklausa netinkama, grąžiname klaidą
     return JsonResponse({'error': 'Invalid request.'}, status=400)
 
+def signup(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()          # creates the user
+            return redirect('login')  # or log them in automatically if you want
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'accounts/signup.html', {'form': form})
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        #logout(request)
+        user.delete()
+        return redirect('login')  # or some "account deleted" page
+    return render(request, 'accounts/login.html')
+
+@login_required
 def home(request):
-    return render(request, 'home.html')  # Grąžiname pagrindinį šabloną
+    return render(request, 'accounts/home.html')
+
+@login_required
+@require_POST
+def save_generated_recipe(request):
+    text = request.POST.get('text')  # or request.body if using JSON
+    if not text:
+        return JsonResponse({'error': 'No text provided'}, status=400)
+
+    obj = GeneratedRecipe.objects.create(
+        user=request.user,
+        content=text
+    )
+
+    return JsonResponse({'success': True, 'id': obj.id})
+
+@login_required
+def my_recipes(request):
+    recipes = GeneratedRecipe.objects.filter(user=request.user).order_by('-created_at')
+    #print(recipes[0].content)
+    return render(request, 'accounts/my_recipes.html', {'recipes': recipes})
