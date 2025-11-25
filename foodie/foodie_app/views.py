@@ -84,3 +84,6 @@ def send_message(request):
 
 def home(request):
     return render(request, 'home.html')  # Grąžiname pagrindinį šabloną
+
+def top_recipes(request):
+    return render(request, "top_recipes.html")
