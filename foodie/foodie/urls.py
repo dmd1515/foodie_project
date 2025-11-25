@@ -17,7 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from . import views
 from foodie_app import views
 from foodie_app.views import send_message  # Importuojame send_message view iš foodie_app aplikacijos
 urlpatterns = [

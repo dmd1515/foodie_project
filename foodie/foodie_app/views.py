@@ -1,14 +1,12 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 from .models import TemporaryImage
 from PIL import Image
 from django.http import JsonResponse
 from .models import TemporaryImage
 import torch
 from io import BytesIO
-
-# Create your views here.
-def home(request):
-    return render(request, 'home.html')
 
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def upload_image(request):
@@ -82,5 +80,16 @@ def send_message(request):
     # Jei užklausa netinkama, grąžiname klaidą
     return JsonResponse({'error': 'Invalid request.'}, status=400)
 
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()          # creates the user
+            return redirect('login')  # or log them in automatically if you want
+    else:
+        form = UserCreationForm()
+    return render(request, 'accounts/signup.html', {'form': form})
+
+@login_required
 def home(request):
-    return render(request, 'home.html')  # Grąžiname pagrindinį šabloną
+    return render(request, 'accounts/home.html')
