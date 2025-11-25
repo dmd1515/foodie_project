@@ -29,6 +29,7 @@ urlpatterns = [
     path('send-message/', send_message, name='send_message'),
     path('delete_uploaded_image/<int:image_id>/', views.delete_uploaded_image, name='delete_uploaded_image'), 
     path('detect/', views.detect_objects, name='detect_objects'),
+    path('delete_account/', views.delete_account, name='delete_account'),
 ]
 
 

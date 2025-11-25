@@ -371,9 +371,11 @@
             <li><a href="#">Home</a></li>
             <li><a href="#">Recipes</a></li>
         </ul>
-        <button id="remove account" class="clear-chat-button" style="position:fixed; bottom:20px;">
-            Remove account
-        </button>
+        <form id="remove account" action ="{% url 'delete_account' %}" method="post" style="position:fixed; bottom:20px;">
+            {% csrf_token %}
+            <input type="submit" name="Remove account" value="Remove account" class="clear-chat-button"></input>
+            
+        </form>
     </div>
 
     <!-- Main Content -->

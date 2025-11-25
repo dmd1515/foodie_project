@@ -91,5 +91,14 @@ def signup(request):
     return render(request, 'accounts/signup.html', {'form': form})
 
 @login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        #logout(request)
+        user.delete()
+        return redirect('login')  # or some "account deleted" page
+    return render(request, 'accounts/login.html')
+
+@login_required
 def home(request):
     return render(request, 'accounts/home.html')
