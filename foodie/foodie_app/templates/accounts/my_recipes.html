@@ -370,6 +370,7 @@
         <ul>
             <li><a href="http://127.0.0.1:8000/">Home</a></li>
             <li><a href="">Recipes</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
         </ul>
         <form id="remove account" action ="{% url 'delete_account' %}" method="post" style="position:fixed; bottom:20px;">
             {% csrf_token %}
