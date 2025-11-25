@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import TemporaryImage
@@ -9,6 +8,7 @@ from django.http import JsonResponse
 from .models import TemporaryImage
 import torch
 from io import BytesIO
+from .forms import CustomUserCreationForm                   # ✅ use this
 
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def upload_image(request):
@@ -84,12 +84,12 @@ def send_message(request):
 
 def signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()          # creates the user
             return redirect('login')  # or log them in automatically if you want
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'accounts/signup.html', {'form': form})
 
 @login_required
