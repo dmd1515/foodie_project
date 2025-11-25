@@ -19,6 +19,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from foodie_app import views
 from foodie_app.views import send_message  # Importuojame send_message view iš foodie_app aplikacijos
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/',  auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
@@ -30,6 +31,8 @@ urlpatterns = [
     path('delete_uploaded_image/<int:image_id>/', views.delete_uploaded_image, name='delete_uploaded_image'), 
     path('detect/', views.detect_objects, name='detect_objects'),
     path('delete_account/', views.delete_account, name='delete_account'),
+    path('save-recipe/', views.save_generated_recipe, name='save_recipe'),
+    path('my-recipes/', views.my_recipes, name='my_recipes'),
 ]
 
 

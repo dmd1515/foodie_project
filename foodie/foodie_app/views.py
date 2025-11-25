@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from .models import TemporaryImage
+from .models import GeneratedRecipe
 from PIL import Image
 from django.http import JsonResponse
 from .models import TemporaryImage
@@ -102,3 +104,23 @@ def delete_account(request):
 @login_required
 def home(request):
     return render(request, 'accounts/home.html')
+
+@login_required
+@require_POST
+def save_generated_recipe(request):
+    text = request.POST.get('text')  # or request.body if using JSON
+    if not text:
+        return JsonResponse({'error': 'No text provided'}, status=400)
+
+    obj = GeneratedRecipe.objects.create(
+        user=request.user,
+        content=text
+    )
+
+    return JsonResponse({'success': True, 'id': obj.id})
+
+@login_required
+def my_recipes(request):
+    recipes = GeneratedRecipe.objects.filter(user=request.user).order_by('-created_at')
+    #print(recipes[0].content)
+    return render(request, 'accounts/my_recipes.html', {'recipes': recipes})
