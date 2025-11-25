@@ -122,4 +122,5 @@ def save_generated_recipe(request):
 @login_required
 def my_recipes(request):
     recipes = GeneratedRecipe.objects.filter(user=request.user).order_by('-created_at')
+    #print(recipes[0].content)
     return render(request, 'accounts/my_recipes.html', {'recipes': recipes})

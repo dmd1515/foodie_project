@@ -382,28 +382,20 @@
     <div class="main-content">
         <div class="chat-area">
             <h2>Chat with Foodie</h2> <!-- Pakeistas tekstas ir stilius -->
-            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-messages" id="chat-messages">
+                <ul>
+                    {% for t in recipes %}
+                        <li>
+                            <strong>{{ t.created_at }}</strong><br>
+                            <div class="message bot" id="initial-message-1">{{ t.content }}</div>
+                        </li>
+                    {% empty %}
+                        <li>You have no saved texts yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-
-        <script type="module">
-            const chatMessages = document.getElementById('chat-messages');
-            console.log(recipes);
-            function fillRecipes(){
-                recipes.forEach(recipe => {
-                    const botMessage = document.createElement('div');
-                    botMessage.className = 'message bot';
-                    botMessage.textContent = recipe.content;
-                
-                    const saveBtn = document.createElement('button');
-                    saveBtn.className = 'edit-button';
-                    saveBtn.textContent = 'Save as PDF';
-                    saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
-                    botMessage.appendChild(saveBtn);
-                
-                    chatMessages.appendChild(botMessage);
-                });
-            }
-        </script>
+    </div>
 
 </body>
 </html>
