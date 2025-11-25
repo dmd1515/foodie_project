@@ -180,18 +180,18 @@
         }
 
         .chat-messages .message {
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 4px;
-    background-color: #e9ecef;
-    max-width: 70%;
-    position: relative;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            max-width: 70%;
+            position: relative;
             width: fit-content;
-    white-space: normal;      /* Preserves newlines and wraps */
-    word-wrap: break-word;      /* Breaks long words if needed */
-    overflow-wrap: anywhere;  /* Modern version */
-    min-width: 0;
-}
+            white-space: pre-wrap;      /* Preserves newlines and wraps */
+            word-wrap: break-word;      /* Breaks long words if needed */
+            overflow-wrap: anywhere;  /* Modern version */
+            min-width: 0;
+        }
 
         .chat-messages .message.user {
             background-color: #007bff;
@@ -368,8 +368,8 @@
     <div class="sidebar">
         <h1>FOODIE</h1>
         <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Recipes</a></li>
+            <li><a href="">Home</a></li>
+            <li><a href="my-recipes/">Recipes</a></li>
         </ul>
         <form id="remove account" action ="{% url 'delete_account' %}" method="post" style="position:fixed; bottom:20px;">
             {% csrf_token %}
@@ -474,6 +474,24 @@
         });
         
         // Modified Send button handler (NEW detection flow)
+        function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+        const csrftoken = getCookie('csrftoken');
+
         document.getElementById('send-button').addEventListener('click', async function() {
             const chatInput = document.getElementById('chat-input');
             const chatMessages = document.getElementById('chat-messages');
@@ -601,6 +619,31 @@
                 botMessage.appendChild(saveBtn);
                 
                 chatMessages.appendChild(botMessage);
+
+                try {
+                    fetch("{% url 'save_recipe' %}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": csrftoken,
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: "text=" + encodeURIComponent(geminiResponse),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log("Saved with id:", data.id);
+                        } else {
+                            console.error("Error:", data);
+                        }
+                    });
+                } catch (error) {
+                    console.error("Error:", error);
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'message bot';
+                    errorMsg.textContent = "⚠️ Error: " + error.message;
+                    chatMessages.appendChild(errorMsg);
+                }
             }
             
             // Clear image preview after everything is done
