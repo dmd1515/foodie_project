@@ -4,6 +4,7 @@ from google import genai
 import base64
 
 
+
 def sendPrompt(prompt):
     client = genai.Client(api_key=base64.b64decode("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"))
     response = client.models.generate_content(

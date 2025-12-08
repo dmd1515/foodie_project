@@ -127,3 +127,7 @@ def my_recipes(request):
 
 def top_recipes(request):
     return render(request, "top_recipes.html")
+
+@login_required
+def send_prompt(request):
+    return render(request, 'accounts/send_prompt.html')

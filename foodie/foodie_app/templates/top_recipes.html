@@ -377,7 +377,7 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="chat-area">
-            <h2>Chat with Foodie</h2> <!-- Pakeistas tekstas ir stilius -->
+            <h2>TOP Recipes</h2> <!-- Pakeistas tekstas ir stilius -->
             <div class="chat-messages" id="chat-messages">
                 <!-- Example messages -->
                 <div class="message bot" id="initial-message-1">Generating...</div>
@@ -389,17 +389,20 @@
             import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-ai";
             console.log("GoogleGenerativeAI loaded:", GoogleGenerativeAI);
         // JavaScript for handling button clicks
-
+        const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
         document.addEventListener("DOMContentLoaded", 
             createTOPRecipes
         );
 
         async function createTOPRecipes() {
-            document.getElementById("initial-message-1").innerText = await sendPrompt(createPrompt());
+            let month = months[new Date().getMonth()];
+            let year = new Date().getFullYear();
+            let recipes = await sendPrompt(createPrompt(month , year));
+            document.getElementById("initial-message-1").innerText = "TOP Recipes for " + month + ", " + year + ":\n\n" + recipes;
         }
 
-        function createPrompt() {
-            let prompt = "Generate 5 seasonal recipes that are the most popular right now. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
+        function createPrompt(month, year) {
+            let prompt = "Generate 3 seasonal recipes that are the most popular for the month of " + month + ", " + year + ". Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
             return prompt;
         }
 
