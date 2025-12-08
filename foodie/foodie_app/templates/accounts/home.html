@@ -361,6 +361,66 @@
                 white-space: normal;
             }
         }
+
+        .switch {
+        position: relative;
+        display: inline-block;
+        width: 30px;
+        height: 17px;
+        }
+
+        .switch input { 
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 13px;
+        width: 13px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        input:checked + .slider {
+        background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+        -webkit-transform: translateX(13px);
+        -ms-transform: translateX(13px);
+        transform: translateX(13px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+        border-radius: 17px;
+        }
+
+        .slider.round:before {
+        border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -399,7 +459,7 @@
                 <option value="Breakfast">Breakfast</option>
                 <option value="Lunch">Lunch</option>
                 <option value="Dinner">Dinner</option>
-                <option value="Night">Night snack</option>
+                <option value="Night snack">Night snack</option>
               </select>
               <select name="Meal type" id="Meal-type">
                 <option value="default", selected="selected">Any type</option>
@@ -423,6 +483,10 @@
                 <option value="Less than 1 h">Less than 1 h.</option>
                 <option value="More than 1 h">Longer than 1h.</option>
               </select>
+                <label class="switch">
+                    <input type="checkbox" id="ingredients-toggle">
+                    <span class="slider round"></span>
+                </label>
             </div>
             <div class="photo-buttons">
                 <button id="add-photo-button">Add Photo</button>
@@ -464,6 +528,8 @@
             import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-ai";
             console.log("GoogleGenerativeAI loaded:", GoogleGenerativeAI);
         // JavaScript for handling button clicks
+        let useExtraIngredients = false;
+
         document.getElementById("add-photo-button").addEventListener("click", function () {
             document.getElementById("upload-modal").style.display = "flex"; // Open the modal
         });
@@ -493,6 +559,16 @@
             }
 
         const csrftoken = getCookie('csrftoken');
+
+        document.getElementById("ingredients-toggle").addEventListener("change", function() {
+            if (this.checked) {
+                alert("Ingredients list will be included in the response.");
+                useExtraIngredients = true;
+            } else {
+                alert("Ingredients list will NOT be included in the response.");
+                useExtraIngredients = false;
+            }
+        });
 
         document.getElementById('send-button').addEventListener('click', async function() {
             const chatInput = document.getElementById('chat-input');
@@ -915,10 +991,10 @@
 
       async function sendUserPrompt(text) {
         var templatePrompt1 = "Generate 3 recipes using these ingredients: ";
-        var templatePrompt2 = ". "
+        var templatePrompt2 = ". These must be recipes"
         var mealTime = document.getElementById("Meal-time").value 
         if(mealTime != "default")
-          templatePrompt2 += "These must be " + mealTime + "recipes";
+          templatePrompt2 += " for " + mealTime; 
         var mealType = document.getElementById("Meal-type").value
         if(mealType != "default")
           templatePrompt2 += " for a " + mealType;
@@ -928,8 +1004,14 @@
         var cookTime = document.getElementById("Cook-time").value
         if(cookTime != "default")
           templatePrompt2 += " that is made in " + cookTime;
-        var templatePrompt4 = ". One of these recipes must made with only the mentioned ingredients and nothing more. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
-        return await sendPrompt(templatePrompt1 + templatePrompt2 + text + templatePrompt4);
+        if(templatePrompt2 == ". These must be recipes ")
+            {templatePrompt2 = ""}
+        if(useExtraIngredients)
+          {templatePrompt2 += ". You can use other ingredients as well";}
+        else
+            {templatePrompt2 += ". You must only use the mentioned ingredients and nothing more";}
+        var templatePrompt4 = ". Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
+        return await sendPrompt(templatePrompt1 + text + templatePrompt2  + templatePrompt4);
       }
     </script>
 </body>
