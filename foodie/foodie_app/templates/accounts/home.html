@@ -722,17 +722,6 @@
                     
                     chatMessages.appendChild(botMessage);
                 });
-                //const botMessage = document.createElement('div');
-                //botMessage.className = 'message bot';
-                //botMessage.textContent = geminiResponse;
-                
-                const saveBtn = document.createElement('button');
-                saveBtn.className = 'edit-button';
-                saveBtn.textContent = 'Save as PDF';
-                saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
-                botMessage.appendChild(saveBtn);
-                
-                chatMessages.appendChild(botMessage);
 
                 try {
                     fetch("{% url 'save_recipe' %}", {
