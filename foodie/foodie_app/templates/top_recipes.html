@@ -395,7 +395,7 @@
         );
 
         async function createTOPRecipes() {
-            console.log(sendPrompt(createPrompt()));
+            document.getElementById("initial-message-1").innerText = await sendPrompt(createPrompt());
         }
 
         function createPrompt() {
@@ -404,13 +404,13 @@
         }
 
         async function sendPrompt(userPrompt){
-        const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RGYzNWd2SWVzT01XTFJJeHB3blFuOUc1MEpJOVpsTkNz"));
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const prompt = userPrompt;
-        
-        const result = await model.generateContent(prompt);
-        console.log(result.response.text());
-        return result.response.text();
+            const genAI = new GoogleGenerativeAI(atob("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"));
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const prompt = userPrompt;
+            
+            const result = await model.generateContent(prompt);
+            console.log(result.response.text());
+            return result.response.text();
       }
     </script>
 </body>

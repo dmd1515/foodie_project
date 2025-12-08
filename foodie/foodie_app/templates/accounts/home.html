@@ -904,8 +904,8 @@
         }
 
       async function sendPrompt(userPrompt){
-        const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RGYzNWd2SWVzT01XTFJJeHB3blFuOUc1MEpJOVpsTkNz"));
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const genAI = new GoogleGenerativeAI(atob("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"));
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const prompt = userPrompt;
         
         const result = await model.generateContent(prompt);
