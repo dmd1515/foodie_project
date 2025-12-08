@@ -275,6 +275,19 @@
             background-color: #218838;
         }
 
+        .options-container-horizontal {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .options-container-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
         .char-counter {
             font-size: 0.9rem;
             color: #666;
@@ -453,23 +466,26 @@
         <!-- Chat Input and Buttons -->
         <div class="chat-input-container">
             <textarea id="chat-input" placeholder="Type your message..." maxlength="300"></textarea>
-            <div> 
-              <select name="Meal time" id="Meal-time">
-                <option value="default", selected="selected">Any time</option>
-                <option value="Breakfast">Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Night snack">Night snack</option>
-              </select>
-              <select name="Meal type" id="Meal-type">
-                <option value="default", selected="selected">Any type</option>
-                <option value="Main dish">Main dish</option>
-                <option value="Side dish">Side dish</option>
-                <option value="Desert">Desert</option>
-                <option value="Soup">Soup</option>
-                <option value="non-Alcohol drink">Alcohol-free drink</option>
-                <option value="Alcohol drink">Alcohol drink</option>
-              </select>
+            <div class="options-container-vertical"> 
+              <div class="options-container-horizontal">
+                    <select name="Meal time" id="Meal-time">
+                    <option value="default", selected="selected">Any time</option>
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Night snack">Night snack</option>
+                </select>
+                <select name="Meal type" id="Meal-type">
+                    <option value="default", selected="selected">Any type</option>
+                    <option value="Main dish">Main dish</option>
+                    <option value="Side dish">Side dish</option>
+                    <option value="Desert">Desert</option>
+                    <option value="Soup">Soup</option>
+                    <option value="non-Alcohol drink">Alcohol-free drink</option>
+                    <option value="Alcohol drink">Alcohol drink</option>
+                </select>
+              </div>
+            <div class="options-container-horizontal">
               <select name="Difficulty" id="Difficulty">
                 <option value="default", selected="selected">Any difficulty</option>
                 <option value="Beginners">Beginner</option>
@@ -483,10 +499,14 @@
                 <option value="Less than 1 h">Less than 1 h.</option>
                 <option value="More than 1 h">Longer than 1h.</option>
               </select>
+            </div>
+            <div class="options-container-horizontal">
+                <label>Allow other ingredients</label>
                 <label class="switch">
                     <input type="checkbox" id="ingredients-toggle">
                     <span class="slider round"></span>
                 </label>
+            </div>
             </div>
             <div class="photo-buttons">
                 <button id="add-photo-button">Add Photo</button>
