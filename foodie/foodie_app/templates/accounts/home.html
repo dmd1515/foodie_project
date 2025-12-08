@@ -999,39 +999,26 @@
             modal.style.display = "none";
         }
 
-      async function sendPrompt(userPrompt){
-        const genAI = new GoogleGenerativeAI(atob("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"));
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const prompt = userPrompt;
-        
-        const result = await model.generateContent(prompt);
-        console.log(result.response.text());
-        return result.response.text();
-      }
-
       async function sendUserPrompt(text) {
-        var templatePrompt1 = "Generate 3 recipes using these ingredients: ";
-        var templatePrompt2 = ". These must be recipes"
-        var mealTime = document.getElementById("Meal-time").value 
-        if(mealTime != "default")
-          templatePrompt2 += " for " + mealTime; 
-        var mealType = document.getElementById("Meal-type").value
-        if(mealType != "default")
-          templatePrompt2 += " for a " + mealType;
-        var mealDiff = document.getElementById("Difficulty").value
-        if(mealDiff != "default")
-          templatePrompt2 += " meant to be cooked by " + mealDiff;
-        var cookTime = document.getElementById("Cook-time").value
-        if(cookTime != "default")
-          templatePrompt2 += " that is made in " + cookTime;
-        if(templatePrompt2 == ". These must be recipes ")
-            {templatePrompt2 = ""}
-        if(useExtraIngredients)
-          {templatePrompt2 += ". You can use other ingredients as well";}
-        else
-            {templatePrompt2 += ". You must only use the mentioned ingredients and nothing more";}
-        var templatePrompt4 = ". Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
-        return await sendPrompt(templatePrompt1 + text + templatePrompt2  + templatePrompt4);
+        let data = {
+            "prompt": text,
+            "mealTime": document.getElementById("Meal-time").value,
+            "mealType": document.getElementById("Meal-type").value,
+            "mealDiff": document.getElementById("Difficulty").value,
+            "cookTime": document.getElementById("Cook-time").value,
+            "useExtraIngredients": useExtraIngredients
+        };
+        let response = await fetch("{% url 'send_prompt' %}", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(data)
+        });
+        let responseData = await response.json();
+       return responseData.data.response;
       }
     </script>
 </body>

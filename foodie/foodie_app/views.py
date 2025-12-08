@@ -8,7 +8,9 @@ from django.http import JsonResponse
 from .models import TemporaryImage
 import torch
 from io import BytesIO
-from .forms import CustomUserCreationForm                   # ✅ use this
+from .forms import CustomUserCreationForm     
+from .recipeGeneretro import *         
+import json
 
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def upload_image(request):
@@ -130,4 +132,10 @@ def top_recipes(request):
 
 @login_required
 def send_prompt(request):
-    return render(request, 'accounts/send_prompt.html')
+    if request.method == "POST":
+        data = json.loads(request.body)
+        print(data["prompt"])
+        responseData = sendPrompt(data)
+        return JsonResponse({'success': True, 'data':responseData})
+    return JsonResponse({'error': 'Invalid request.'}, status=400)
+
