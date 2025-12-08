@@ -386,34 +386,98 @@
 
     </div>
     <script type="module" >
-            import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-ai";
-            console.log("GoogleGenerativeAI loaded:", GoogleGenerativeAI);
         // JavaScript for handling button clicks
         const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        const chatMessages = document.getElementById('chat-messages');
+        const csrftoken = getCookie('csrftoken');
+
+        function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
         document.addEventListener("DOMContentLoaded", 
             createTOPRecipes
         );
 
         async function createTOPRecipes() {
+            const initialMessage = document.getElementById('initial-message-1');
             let month = months[new Date().getMonth()];
             let year = new Date().getFullYear();
-            let recipes = await sendPrompt(createPrompt(month , year));
-            document.getElementById("initial-message-1").innerText = "TOP Recipes for " + month + ", " + year + ":\n\n" + recipes;
+            let response = await sendPrompt(month, year);
+            if (initialMessage) initialMessage.remove();
+
+            response.recipes.forEach((recipe) => {
+            const botMessage = document.createElement('div');
+                botMessage.className = 'message bot';
+                botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>
+                                        Cooking Time: ${recipe.cookingTime}<br/>
+                                        <strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>
+                                        <strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
+                
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'edit-button';
+                saveBtn.textContent = 'Save as PDF';
+                saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
+                botMessage.appendChild(saveBtn);
+                
+                chatMessages.appendChild(botMessage);
+
+                try {
+                        fetch("{% url 'save_recipe' %}", {
+                            method: "POST",
+                            headers: {
+                                "X-CSRFToken": csrftoken,
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(recipe),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                console.log("Saved with id:", data.id);
+                            } else {
+                                console.error("Error:", data);
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Error:", error);
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'message bot';
+                        errorMsg.textContent = "⚠️ Error: " + error.message;
+                        chatMessages.appendChild(errorMsg);
+                    }
+        });
         }
 
-        function createPrompt(month, year) {
-            let prompt = "Generate 3 seasonal recipes that are the most popular for the month of " + month + ", " + year + ". Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
-            return prompt;
-        }
-
-        async function sendPrompt(userPrompt){
-            const genAI = new GoogleGenerativeAI(atob("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"));
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-            const prompt = userPrompt;
-            
-            const result = await model.generateContent(prompt);
-            console.log(result.response.text());
-            return result.response.text();
+        async function sendPrompt(month, year){
+            let data = {
+                "promptType": "TOP",
+                "month": month,
+                "year": year,
+            };
+            let response = await fetch("{% url 'send_prompt' %}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(data)
+            });
+            let responseData = await response.json();
+            responseData = JSON.parse(responseData.data);
+            return responseData;
       }
     </script>
 </body>

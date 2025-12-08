@@ -1008,7 +1008,8 @@
 
       async function sendUserPrompt(text) {
         let data = {
-            "prompt": text,
+            "promptType": "default",
+            "ingredients": text,
             "mealTime": document.getElementById("Meal-time").value,
             "mealType": document.getElementById("Meal-type").value,
             "mealDiff": document.getElementById("Difficulty").value,
