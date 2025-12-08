@@ -721,32 +721,34 @@
                     botMessage.appendChild(saveBtn);
                     
                     chatMessages.appendChild(botMessage);
-                });
 
-                try {
-                    fetch("{% url 'save_recipe' %}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRFToken": csrftoken,
-                            "Content-Type": "application/x-www-form-urlencoded",
-                        },
-                        body: "text=" + encodeURIComponent(geminiResponse),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log("Saved with id:", data.id);
-                        } else {
-                            console.error("Error:", data);
-                        }
-                    });
-                } catch (error) {
-                    console.error("Error:", error);
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'message bot';
-                    errorMsg.textContent = "⚠️ Error: " + error.message;
-                    chatMessages.appendChild(errorMsg);
-                }
+                    try {
+                        fetch("{% url 'save_recipe' %}", {
+                            method: "POST",
+                            headers: {
+                                "X-CSRFToken": csrftoken,
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(recipe),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                console.log("Saved with id:", data.id);
+                            } else {
+                                console.error("Error:", data);
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Error:", error);
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'message bot';
+                        errorMsg.textContent = "⚠️ Error: " + error.message;
+                        chatMessages.appendChild(errorMsg);
+                    }
+                });
+//xdxdxdxd
+                
             }
             
             // Clear image preview after everything is done
@@ -1010,7 +1012,7 @@
             "mealTime": document.getElementById("Meal-time").value,
             "mealType": document.getElementById("Meal-type").value,
             "mealDiff": document.getElementById("Difficulty").value,
-            "cookTime": document.getElementById("Cook-time").value,
+            "cookingTime": document.getElementById("Cook-time").value,
             "useExtraIngredients": useExtraIngredients
         };
         let response = await fetch("{% url 'send_prompt' %}", {

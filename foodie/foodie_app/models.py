@@ -19,10 +19,10 @@ class TemporaryImage(models.Model):
 
 class GeneratedRecipe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='generated_recipes')
-    content = models.TextField()
-    #title = models.CharField(max_length=255)
-    #ingredients = models.TextField()
-    #instructions = models.TextField()
+    title = models.TextField()
+    cookingTime = models.TextField()
+    ingredients = models.TextField()
+    instructions = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

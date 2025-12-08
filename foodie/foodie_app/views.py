@@ -11,6 +11,8 @@ from io import BytesIO
 from .forms import CustomUserCreationForm     
 from .recipeGeneretro import *         
 import json
+import ast
+from django.core.serializers.json import DjangoJSONEncoder
 
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def upload_image(request):
@@ -110,23 +112,61 @@ def home(request):
 @login_required
 @require_POST
 def save_generated_recipe(request):
-    text = request.POST.get('text')  # or request.body if using JSON
-    if not text:
+    data = json.loads(request.body)
+    if not data:
         return JsonResponse({'error': 'No text provided'}, status=400)
 
+    
     obj = GeneratedRecipe.objects.create(
         user=request.user,
-        content=text
+        title=data.get('name', 'Untitled Recipe'),
+        cookingTime=data.get('cookingTime', ''),
+        ingredients=data.get('ingredients', []),
+        instructions=data.get('instructions', [])
     )
 
     return JsonResponse({'success': True, 'id': obj.id})
 
 @login_required
 def my_recipes(request):
-    recipes = GeneratedRecipe.objects.filter(user=request.user).order_by('-created_at')
-    #print(recipes[0].content)
-    return render(request, 'accounts/my_recipes.html', {'recipes': recipes})
+    qs = GeneratedRecipe.objects.filter(user=request.user).order_by('-created_at')
 
+    recipes_data = []
+    for r in qs:
+        ingredients = []
+        if r.ingredients:
+            try:
+                # if it's valid JSON: ["...","..."]
+                ingredients = json.loads(r.ingredients)
+            except json.JSONDecodeError:
+                # if it's Python repr: ['...','...']
+                ingredients = ast.literal_eval(r.ingredients)
+
+        # Parse instructions similarly if needed
+        instructions = []
+        if r.instructions:
+            try:
+                instructions = json.loads(r.instructions)
+            except json.JSONDecodeError:
+                instructions = ast.literal_eval(r.instructions)
+
+        recipes_data.append({
+            "id": r.id,
+            "name": r.title,
+            "cookingTime": r.cookingTime,
+            "ingredients": ingredients,     
+            "instructions": instructions,    
+            "created_at": r.created_at,
+        })
+
+    return render(
+            request,
+            'accounts/my_recipes.html',
+            {
+                'recipes': qs,  
+                'recipes_json': json.dumps(recipes_data, cls=DjangoJSONEncoder),
+            },
+        )
 def top_recipes(request):
     return render(request, "top_recipes.html")
 
@@ -134,7 +174,6 @@ def top_recipes(request):
 def send_prompt(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        print(data["prompt"])
         responseData = sendPrompt(data)
         return JsonResponse({'success': True, 'data':responseData})
     return JsonResponse({'error': 'Invalid request.'}, status=400)

@@ -384,19 +384,54 @@
         <div class="chat-area">
             <h2>Chat with Foodie</h2> <!-- Pakeistas tekstas ir stilius -->
             <div class="chat-messages" id="chat-messages">
-                <ul>
-                    {% for t in recipes %}
-                        <li>
-                            <strong>{{ t.created_at }}</strong><br>
-                            <div class="message bot" id="initial-message-1">{{ t.content }}</div>
-                        </li>
-                    {% empty %}
-                        <li>You have no saved texts yet.</li>
-                    {% endfor %}
-                </ul>
             </div>
         </div>
     </div>
 
 </body>
+
+<script id="recipes-data" type="application/json">
+    {{ recipes_json|safe }}
+</script>
+
+
+<script>
+    const recipes = JSON.parse(
+        document.getElementById('recipes-data').textContent
+    );
+    const chatMessages = document.getElementById('chat-messages');
+
+
+    console.log(recipes); // array of objects
+
+    // Example: build your HTML snippet from JS
+    const container = document.getElementById('recipes-container');
+
+    recipes.forEach((recipe) => {
+        const botMessage = document.createElement('div');
+            botMessage.className = 'message bot';
+            botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>
+                                    Cooking Time: ${recipe.cookingTime}<br/>
+                                    <strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>
+                                    <strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'edit-button';
+            saveBtn.textContent = 'Save as PDF';
+            saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
+            botMessage.appendChild(saveBtn);
+            
+            chatMessages.appendChild(botMessage);
+    });
+
+    function SaveRecipeAsPDF(messageElement) {
+          const doc = new jsPDF();
+          const text = messageElement.textContent;
+  
+          doc.setFontSize(8);
+          doc.text(text, 10, 10);
+          // force download
+          doc.save('Recipe.pdf');
+        }
+</script>
 </html>

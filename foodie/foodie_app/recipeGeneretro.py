@@ -4,7 +4,7 @@ from google import genai
 import base64
 import json
 
-def generatePrompt(ingredients, mealTime, mealType, mealDiff, cookTime, useExtraIngredients):
+def generatePrompt(ingredients, mealTime, mealType, mealDiff, cookingTime, useExtraIngredients):
     templatePrompt1 = "Generate 3 recipes using these ingredients: "
     templatePrompt2 = ". These must be recipes"
     if(mealTime != "default"):
@@ -13,8 +13,8 @@ def generatePrompt(ingredients, mealTime, mealType, mealDiff, cookTime, useExtra
         templatePrompt2 += " for a " + mealType
     if(mealDiff != "default"):
         templatePrompt2 += " meant to be cooked by " + mealDiff
-    if(cookTime != "default"):
-        templatePrompt2 += " that is made in " + cookTime
+    if(cookingTime != "default"):
+        templatePrompt2 += " that is made in " + cookingTime
     if(templatePrompt2 == ". These must be recipes"):
         templatePrompt2 = ""
     if(useExtraIngredients):
@@ -42,9 +42,9 @@ def sendPrompt(data):
     mealTime = data.get("mealTime", "default")
     mealType = data.get("mealType", "default")
     mealDiff = data.get("mealDiff", "default")
-    cookTime = data.get("cookTime", "default")
+    cookingTime = data.get("cookingTime", "default")
     useExtraIngredients = data.get("useExtraIngredients", False)
-    prompt = generatePrompt(ingredients, mealTime, mealType, mealDiff, cookTime, useExtraIngredients)
+    prompt = generatePrompt(ingredients, mealTime, mealType, mealDiff, cookingTime, useExtraIngredients)
     #client = genai.Client(api_key=base64.b64decode("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"))
     #response = client.models.generate_content(
     #    model="gemini-2.5-flash", contents=prompt
