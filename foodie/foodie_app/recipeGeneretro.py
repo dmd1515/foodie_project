@@ -29,6 +29,14 @@ def generatePrompt(ingredients, mealTime, mealType, mealDiff, cookTime, useExtra
     " { \"recipes\" : [ { \"name\": value, \"cookingTime\": value, \"ingredients\":[value1, value2, ...], \"instructions\": [value1, value2,...] }, ...] }"
     return templatePrompt1 + ingredients + templatePrompt2  + templatePrompt4
 
+def trimResponse(responseText):
+    startIndex = responseText.find("```json") + 7
+    endIndex = responseText.rfind("```")
+    if startIndex != -1 and endIndex != -1:
+        return responseText[startIndex:endIndex]
+    else:
+        return responseText
+
 def sendPrompt(data):
     ingredients = data["prompt"]
     mealTime = data.get("mealTime", "default")
@@ -37,9 +45,68 @@ def sendPrompt(data):
     cookTime = data.get("cookTime", "default")
     useExtraIngredients = data.get("useExtraIngredients", False)
     prompt = generatePrompt(ingredients, mealTime, mealType, mealDiff, cookTime, useExtraIngredients)
-    client = genai.Client(api_key=base64.b64decode("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"))
-    response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=prompt
-)
-    responseData = response.text
-    return responseData
+    #client = genai.Client(api_key=base64.b64decode("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"))
+    #response = client.models.generate_content(
+    #    model="gemini-2.5-flash", contents=prompt
+    #)
+    #responseData = response.text
+    responseData = '''```json
+    {
+  "recipes": [
+    {
+      "name": "Strawberry Cereal Classic",
+      "cookingTime": "2 minutes",
+      "ingredients": [
+        "Your favorite dry cereal",
+        "Milk (any type)",
+        "Fresh strawberries"
+      ],
+      "instructions": [
+        "Wash and hull the fresh strawberries. Slice or dice them into bite-sized pieces.",
+        "Pour your desired amount of cereal into a serving bowl.",
+        "Arrange the sliced strawberries on top of the cereal.",
+        "Pour milk over the cereal and strawberries until your desired consistency is reached.",
+        "Serve immediately and enjoy!"
+      ]
+    },
+    {
+      "name": "Layered Strawberry Cereal Delight",
+      "cookingTime": "5 minutes",
+      "ingredients": [
+        "Your favorite crunchy dry cereal",
+        "Milk (any type)",
+        "Fresh strawberries"
+      ],
+      "instructions": [
+        "Wash and hull the fresh strawberries. Slice them thinly or dice into small pieces.",
+        "In a clear glass or bowl, create the first layer by adding a portion of cereal.",
+        "Next, add a layer of sliced strawberries over the cereal.",
+        "Pour a small amount of milk over the strawberry layer.",
+        "Repeat the layers: cereal, then strawberries, then a small pour of milk, until the glass or bowl is full.",
+        "Finish with a final small layer of strawberries on top for garnish.",
+        "Serve immediately to maintain cereal crunch."
+      ]
+    },
+    {
+      "name": "Creamy Strawberry Cereal Bowl",
+      "cookingTime": "7 minutes",
+      "ingredients": [
+        "Your favorite dry cereal",
+        "Milk (any type)",
+        "Fresh strawberries"
+      ],
+      "instructions": [
+        "Wash and hull the fresh strawberries. Place them in a separate small bowl.",
+        "Using a fork, mash the strawberries until they form a chunky puree. Leave some small pieces for texture if desired.",
+        "Add about half of your desired milk amount to the mashed strawberries and stir well to create a pink strawberry milk mixture.",
+        "Pour your desired amount of cereal into a serving bowl.",
+        "Pour the creamy strawberry milk mixture over the cereal.",
+        "Add the remaining milk if you prefer more liquid, and stir gently to combine.",
+        "Serve immediately."
+      ]
+    }
+  ]
+}
+```
+'''
+    return trimResponse(responseData)
