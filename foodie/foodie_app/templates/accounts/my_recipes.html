@@ -10,32 +10,59 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
     </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>    </script>
-        <link rel="stylesheet" href ="{% static 'styles.css' %}" />
+        <link rel="stylesheet" href ="{% static 'styles1.css' %}" />
 
 </head>
 <body>
+<div class="layout">
     <!-- Sidebar -->
-    <div class="sidebar">
-        <h1>FOODIE</h1>
-        <ul>
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'my_recipes' %}">Recipes</a></li>
-            <li><a href="{% url 'top_recipes' %}">TOP Recipes</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-            <li><a href="{% url 'delete_account' %}" >Delete Account</a></li>
-        </ul>
-    </div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>FOODIE</h1>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'home' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                Home
+            </a>
+
+            <a href="{% url 'my_recipes' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'my_recipes' %}active{% endif %}">
+                History
+            </a>
+
+            <a href="{% url 'top_recipes' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'top_recipes' %}active{% endif %}">
+                Top Recipes
+            </a>
+
+            <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+            <a href="{% url 'delete_account' %}" class="nav-link danger">Delete Account</a>
+        </nav>
+    </aside>
 
     <!-- Main Content -->
-    <div class="main-content">
-        <div class="chat-area">
-            <h2>Chat with Foodie</h2> <!-- Pakeistas tekstas ir stilius -->
-            <div class="chat-messages" id="chat-messages">
+<div class="main-content">
+    <div class="history-wrapper">
+        <div class="history-header">
+            <h2>Recipe History</h2>
+            <div class="history-filters">
+                <input type="date" class="date-input" />
             </div>
         </div>
-    </div>
 
+        <!-- Galima vėliau daryti Today / Yesterday grupes, kol kas paliekam vieną sekciją -->
+        <section class="history-section">
+            <h3 class="section-title">All recipes</h3>
+            <div class="recipes-grid" id="chat-messages"></div>
+        </section>
+    </div>
+</div>
+
+</div>
 </body>
+
 
 <script id="recipes-data" type="application/json">
     {{ recipes_json|safe }}
@@ -43,38 +70,149 @@
 
 
 <script>
-    const recipes = JSON.parse(
-        document.getElementById('recipes-data').textContent
-    );
-    const chatMessages = document.getElementById('chat-messages');
+  // Receptai iš Django
+  const recipes = JSON.parse(
+    document.getElementById("recipes-data").textContent
+  );
 
-    const container = document.getElementById('recipes-container');
+  const grid = document.getElementById("chat-messages");
+  const dateInput = document.querySelector(".date-input");
 
-    recipes.forEach((recipe) => {
-        const botMessage = document.createElement('div');
-            botMessage.className = 'message bot';
-            botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>` +
-                                `Cooking Time: ${recipe.cookingTime}<br/>` +
-                                `<strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>` +
-                                `<strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
-                    
-            const saveBtn = document.createElement('button');
-            saveBtn.className = 'edit-button';
-            saveBtn.textContent = 'Save as PDF';
-            saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
-            botMessage.appendChild(saveBtn);
-            
-            chatMessages.appendChild(botMessage);
+  // Ištraukiam datą YYYY-MM-DD iš created_at
+  function getRecipeDate(recipe) {
+    if (recipe.created_at) {
+      return recipe.created_at.toString().slice(0, 10);
+    }
+    return "";
+  }
+
+  // Universalus helperis: iš "['A', 'B']" -> ['A','B']
+  function parseList(field) {
+    if (!field) return [];
+    if (Array.isArray(field)) return field;
+
+    try {
+      // pakeičiam viengubas kabutes į dvigubas ir parse'inam kaip JSON
+      const jsonText = field.toString().replace(/'/g, '"');
+      const parsed = JSON.parse(jsonText);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (e) {
+      // fallback – skaidom per kablelius
+      return field
+        .toString()
+        .replace(/^\[/, "")
+        .replace(/\]$/, "")
+        .replace(/'/g, "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+    return [];
+  }
+
+  // Formatuojam ingredientų tekstą kortelei
+  function formatIngredients(field) {
+    return parseList(field).join(", ");
+  }
+
+  // ===== PDF generavimas tik su reikalingais laukais =====
+  function SaveRecipeAsPDF(recipe) {
+    const doc = new jsPDF();
+
+    const title = recipe.name || "Recipe";
+    const ingredients = parseList(recipe.ingredients);
+    const instructions = parseList(recipe.instructions);
+
+    let lines = [];
+
+    lines.push(title);
+    lines.push(""); // tuščia eilutė
+
+    lines.push("Ingredients:");
+    ingredients.forEach((ing) => {
+      lines.push("- " + ing);
     });
 
-    function SaveRecipeAsPDF(messageElement) {
-          const doc = new jsPDF();
-          const text = messageElement.textContent;
-  
-          doc.setFontSize(8);
-          doc.text(text, 10, 10);
-          // force download
-          doc.save('Recipe.pdf');
-        }
+    lines.push(""); // tarpas
+    lines.push("Instructions:");
+    instructions.forEach((step, i) => {
+      lines.push(`${i + 1}. ${step}`);
+    });
+
+    const text = lines.join("\n");
+
+    doc.setFontSize(10);
+    const split = doc.splitTextToSize(text, 180); // kad neliptų už kraštų
+    doc.text(split, 10, 10);
+    doc.save(`${title}.pdf`);
+  }
+
+  // Pagrindinė funkcija – perpiešti korteles su (ar be) datos filtro
+  function renderRecipes(filterDate = null) {
+    grid.innerHTML = "";
+
+    recipes.forEach((recipe) => {
+      const recipeDate = getRecipeDate(recipe);
+
+      if (filterDate && recipeDate !== filterDate) {
+        return;
+      }
+
+      const card = document.createElement("article");
+      card.className = "recipe-card";
+
+      const title = recipe.name || "Untitled recipe";
+      const cookingTime = recipe.cookingTime || "N/A";
+      const ingredientsText = formatIngredients(recipe.ingredients);
+      const difficulty = recipe.difficulty || "Medium";
+
+      card.innerHTML = `
+        <div class="recipe-card-header">
+          <div>
+            <h4 class="recipe-title">${title}</h4>
+            <p class="recipe-subtitle">
+              ${recipeDate || ""}
+            </p>
+          </div>
+          <button class="icon-button" type="button">🍽</button>
+        </div>
+
+        <div class="recipe-meta">
+          <span class="badge badge-medium">${difficulty}</span>
+          <span class="meta-time">⏱ ${cookingTime}</span>
+        </div>
+
+        <div class="recipe-body">
+          <p class="label">Ingredients:</p>
+          <p class="ingredients">${ingredientsText}</p>
+        </div>
+
+        <div class="card-actions">
+          <button class="save-btn" type="button">Save as PDF</button>
+        </div>
+      `;
+
+      const saveBtn = card.querySelector(".save-btn");
+      // čia perduodam ne kortelę, o RECEPTĄ
+      saveBtn.addEventListener("click", () => SaveRecipeAsPDF(recipe));
+
+      grid.appendChild(card);
+    });
+  }
+
+  // Inicinis atvaizdavimas – visi receptai
+  renderRecipes();
+
+  // Filtravimas pagal datą
+  if (dateInput) {
+    dateInput.addEventListener("change", () => {
+      const selected = dateInput.value || null;
+      renderRecipes(selected);
+    });
+  }
 </script>
+
+
+
+
 </html>
