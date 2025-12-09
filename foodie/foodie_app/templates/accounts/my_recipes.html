@@ -122,6 +122,16 @@
         saveButton.style.borderRadius = '4px';
         saveButton.style.cursor = 'pointer';
         
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove Tag';
+        removeButton.style.backgroundColor = '#ff0000';
+        removeButton.style.color = '#fff';
+        removeButton.style.border = 'none';
+        removeButton.style.padding = '5px 10px';
+        removeButton.style.borderRadius = '4px';
+        removeButton.style.cursor = 'pointer';
+        removeButton.style.marginLeft = '10px';
+
         const cancelButton = document.createElement('button');
         cancelButton.textContent = 'Cancel';
         cancelButton.style.backgroundColor = '#ff0000';
@@ -143,6 +153,7 @@
         container.appendChild(editInput);
         container.appendChild(editCharCounter);
         container.appendChild(saveButton);
+        container.appendChild(removeButton);
         container.appendChild(cancelButton);
 
         const parent = originalButton.parentNode;
@@ -168,6 +179,14 @@
             
             let tagField = document.getElementById(`recipe${recipeId}`)
             tagField.innerText = `Tag: ${editInput.value}\n`;
+        });
+
+        removeButton.addEventListener('click', async function() {
+            parent.replaceChild(originalButton, container);
+            await sendTag('', recipeId); // Replace 1 with actual recipe ID
+            
+            let tagField = document.getElementById(`recipe${recipeId}`)
+            tagField.innerText = '';
         });
 
         cancelButton.addEventListener('click', function() {
