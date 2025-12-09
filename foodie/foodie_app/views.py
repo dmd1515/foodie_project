@@ -102,6 +102,9 @@ def delete_account(request):
     user.delete()
     return render(request, 'accounts/login.html')
 
+def login(request):
+    return render(request, 'accounts/login.html')
+
 @login_required
 def home(request):
     return render(request, 'accounts/home.html')
