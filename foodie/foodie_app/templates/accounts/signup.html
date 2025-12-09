@@ -2,42 +2,73 @@
 
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Django Auth Demo</title>
-    <link rel="stylesheet" href ="{% static 'styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
+  </head>
+  <body>
+    <div class="loginPage">
+      <h2>Sign up</h2>
+      <form method="post">
+        {% csrf_token %}
 
-</head>
-<body>
-    <div class = "loginPage">
-        <h2>Sign up</h2>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="csrfmiddlewaretoken" value="4CnwUah9sVOEABomaF5RhlTSRMajUD5VJ6TA8GtrMsVCcVRC090KWgaPxyr4LcGa">
-            <p>
-                <label for="id_username">Username</label> 
-                <input type="text" name="username" maxlength="150" autofocus="" required="" id="id_username"> 
-                <span class="helptext">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</span>
-            </p>
-            <p>
-                <label for="id_email">Email</label> <input type="email" name="email" required="" id="id_email">
-            </p>
-            <div class="password-field">
-                <p>
-                    <label for="id_password1">Password</label> 
-                    <input type="password" name="password1" autocomplete="new-password" required="" id="id_password1"> 
-                    <span class="helptext"></span>
-                </p>
-                <ul class="password-help">
-                    <li>Your password can’t be too similar to your other personal information.</li>
-                    <li>Your password must contain at least 8 characters.</li>
-                    <li>Your password can’t be a commonly used password.</li>
-                    <li>Your password can’t be entirely numeric.</li>
-                </ul>
-            </div>
-            <p></p>
-            <p><label for="id_password2">Reenter password</label> <input type="password" name="password2" autocomplete="new-password" required="" id="id_password2"></p>
-            <button type="submit">Create account</button>
-            <p class="signup-link">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
-        </form>
+        <p>
+          <label for="id_username">Username</label>
+          <input
+            type="text"
+            name="username"
+            maxlength="150"
+            autofocus=""
+            required=""
+            id="id_username"
+          />
+          <span class="helptext"
+            >Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.</span
+          >
+        </p>
+        <p>
+          <label for="id_email">Email</label>
+          <input type="email" name="email" required="" id="id_email" />
+        </p>
+        <div class="password-field">
+          <p>
+            <label for="id_password1">Password</label>
+            <input
+              type="password"
+              name="password1"
+              autocomplete="new-password"
+              required=""
+              id="id_password1"
+            />
+            <span class="helptext"></span>
+          </p>
+          <ul class="password-help">
+            <li>
+              Your password can’t be too similar to your other personal
+              information.
+            </li>
+            <li>Your password must contain at least 8 characters.</li>
+            <li>Your password can’t be a commonly used password.</li>
+            <li>Your password can’t be entirely numeric.</li>
+          </ul>
+        </div>
+        <p></p>
+        <p>
+          <label for="id_password2">Reenter password</label>
+          <input
+            type="password"
+            name="password2"
+            autocomplete="new-password"
+            required=""
+            id="id_password2"
+          />
+        </p>
+        <button type="submit">Create account</button>
+        <p class="signup-link">
+          Already have an account? <a href="{% url 'login' %}">Log in</a>
+        </p>
+      </form>
     </div>
-</body>
+  </body>
+</html>
