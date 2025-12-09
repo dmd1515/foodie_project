@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,437 +9,97 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
     </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>    </script>
-    <style>
-        /* Global Styles */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Error message styles */
-        .error-message {
-            color: #dc3545; /* Raudona spalva */
-            font-size: 0.9rem;
-            margin-top: 5px;
-            display: none; /* Paslėptas pagal nutylėjimą */
-        }
-
-        .error-message.visible {
-            display: block; /* Rodyti, kai yra klaida */
-        }
-
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background-color: #fff;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
-        }
-
-        /* File input and preview styles */
-        .file-input-container {
-            margin-bottom: 20px;
-        }
-
-        #image-input {
-            display: none; /* Hide the default file input */
-        }
-
-        #image-preview {
-            max-width: 100%;
-            max-height: 150px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
-        /* Button styles */
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .upload-button,
-        .close-modal {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            flex: 1;
-        }
-
-        .upload-button {
-            background-color: #007bff; /* Blue color */
-            color: #fff;
-        }
-
-        .upload-button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
-        }
-
-        .close-modal {
-            background-color: #6c757d; /* Gray color */
-            color: #fff;
-        }
-
-        .close-modal:hover {
-            background-color: #5a6268; /* Darker gray on hover */
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 250px;
-            background-color: #000; /* Juodas fonas */
-            color: #fff;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Centruojame turinį horizontaliai */
-        }
-
-        .sidebar h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            text-transform: uppercase; /* Pavadinimas didžiosiomis raidėmis */
-            text-align: center; /* Centruojame tekstą */
-            color: #fff; /* Baltas tekstas */
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            width: 100%; /* Užima visą plotį */
-        }
-
-        .sidebar ul li {
-            margin-bottom: 10px;
-        }
-
-        .sidebar ul li a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1rem;
-            display: block;
-            padding: 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-            border: 2px solid #fff; /* Baltas apvadas */
-        }
-
-        .sidebar ul li a:hover {
-            background-color: #333; /* Tamsesnis atspalvis užvedus */
-        }
-
-        /* Main Content Styles */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: #f4f4f4;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .chat-area {
-            flex: 1;
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            overflow-y: auto;
-        }
-
-        .chat-area h2 {
-            font-size: 2rem; /* Padidintas šrifto dydis */
-            margin-bottom: 20px;
-            text-align: center; /* Centruojame tekstą */
-        }
-
-        .chat-messages {
-            margin-bottom: 20px;
-        }
-
-        .chat-messages .message {
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 4px;
-            background-color: #e9ecef;
-            max-width: 70%;
-            position: relative;
-            width: fit-content;
-            white-space: pre-wrap;      /* Preserves newlines and wraps */
-            word-wrap: break-word;      /* Breaks long words if needed */
-            overflow-wrap: anywhere;  /* Modern version */
-            min-width: 0;
-        }
-
-        .chat-messages .message.user {
-            background-color: #007bff;
-            color: #fff;
-            margin-left: auto; /* Align to the right */
-        }
-
-        .chat-messages .message.bot {
-            background-color: #e9ecef;
-            margin-right: auto; /* Align to the left */
-        }
-
-        .chat-messages .message .edit-button {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        .chat-messages .message.user .edit-button {
-            color: #fff;
-        }
-
-        .chat-messages .message.bot .edit-button {
-            color: #000;
-        }
-      .chat-messages .message {
-        margin-bottom: 10px;
-        padding: 10px;
-        border-radius: 4px;
-        background-color: #e9ecef;
-      }
-
-        .chat-input-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .chat-input-container textarea {
-            flex: 1;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            resize: none;
-            font-size: 1rem;
-        }
-
-        .chat-input-container button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .chat-input-container button:hover {
-            background-color: #0056b3;
-        }
-
-        .chat-input-container .photo-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input-container .photo-buttons button {
-            background-color: #28a745;
-        }
-
-        .chat-input-container .photo-buttons button:hover {
-            background-color: #218838;
-        }
-
-        .char-counter {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .clear-chat-button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            background-color: #dc3545;
-            color: #fff;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .clear-chat-button:hover {
-            background-color: #c82333;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-            }
-
-            .sidebar h1 {
-                font-size: 1.5rem;
-            }
-
-            .sidebar ul li a {
-                font-size: 0.9rem;
-            }
-
-            .chat-area h2 {
-                font-size: 1.5rem; /* Mažesnis šrifto dydis mažesniuose ekranuose */
-            }
-
-            .chat-input-container textarea {
-                font-size: 0.9rem;
-            }
-
-            .chat-input-container button {
-                padding: 8px 16px;
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .sidebar {
-                width: 150px;
-            }
-
-            .sidebar h1 {
-                font-size: 1.2rem;
-            }
-
-            .sidebar ul li a {
-                font-size: 0.8rem;
-            }
-
-            .chat-area h2 {
-                font-size: 1.2rem; /* Dar mažesnis šrifto dydis labai mažuose ekranuose */
-            }
-
-            .chat-input-container textarea {
-                font-size: 0.8rem;
-            }
-
-            .chat-input-container button {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-            }
-            .message.user img {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 4px;
-            margin-top: 5px;
-            display: block;
-            }
-
-            .message.user {
-                white-space: normal;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href ="{% static 'styles.css' %}" />
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+     <div class="sidebar">
         <h1>FOODIE</h1>
         <ul>
-            <li><a href="">Home</a></li>
-            <li><a href="my-recipes/">Recipes</a></li>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'my_recipes' %}">Recipes</a></li>
+            <li><a href="{% url 'top_recipes' %}">TOP Recipes</a></li>
             <li><a href="{% url 'logout' %}">Logout</a></li>
+            <li><a href="{% url 'delete_account' %}" >Delete Account</a></li>
         </ul>
-        <form id="remove account" action ="{% url 'delete_account' %}" method="post" style="position:fixed; bottom:20px;">
-            {% csrf_token %}
-            <input type="submit" name="Remove account" value="Remove account" class="clear-chat-button"></input>
-            
-        </form>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="chat-area">
+        <div>
             <h2>Chat with Foodie</h2> <!-- Pakeistas tekstas ir stilius -->
+        </div>
+        <div class="chat-area">
+            
             <div class="chat-messages" id="chat-messages">
                 <!-- Example messages -->
-                <div class="message bot" id="initial-message-1">Hello! How can I help you todaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy?</div>
+                <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
             </div>
         </div>
 
         <!-- Chat Input and Buttons -->
         <div class="chat-input-container">
-            <textarea id="chat-input" placeholder="Type your message..." maxlength="300"></textarea>
-            <div> 
-              <select name="Meal time" id="Meal-time">
-                <option value="default", selected="selected">Any time</option>
-                <option value="Breakfast">Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Night">Night snack</option>
-              </select>
-              <select name="Meal type" id="Meal-type">
-                <option value="default", selected="selected">Any type</option>
-                <option value="Main dish">Main dish</option>
-                <option value="Side dish">Side dish</option>
-                <option value="Desert">Desert</option>
-                <option value="Soup">Soup</option>
-                <option value="non-Alcohol drink">Alcohol-free drink</option>
-                <option value="Alcohol drink">Alcohol drink</option>
-              </select>
-              <select name="Difficulty" id="Difficulty">
-                <option value="default", selected="selected">Any difficulty</option>
-                <option value="Beginners">Beginner</option>
-                <option value="Intermediates">Intermediate</option>
-                <option value="Experts">Expert</option>
-              </select>
-              <select name="Cook time" id="Cook-time">
-                <option value="default", selected="selected">Any cook time</option>
-                <option value="Less than 10 min">Less than 10 min.</option>
-                <option value="Less than 30 min">Less than 30 min.</option>
-                <option value="Less than 1 h">Less than 1 h.</option>
-                <option value="More than 1 h">Longer than 1h.</option>
-              </select>
+            <div class="options-container-vertical">
+                <div class="options-container-horizontal">
+                    <select name="Meal time" id="Meal-time">
+                        <option value="default", selected="selected">Any time</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Night snack">Night snack</option>
+                    </select>
+                    <select name="Meal type" id="Meal-type">
+                        <option value="default", selected="selected">Any type</option>
+                        <option value="Main dish">Main dish</option>
+                        <option value="Side dish">Side dish</option>
+                        <option value="Desert">Desert</option>
+                        <option value="Soup">Soup</option>
+                        <option value="non-Alcohol drink">Alcohol-free drink</option>
+                        <option value="Alcohol drink">Alcohol drink</option>
+                    </select>
+                    <select name="Difficulty" id="Difficulty">
+                        <option value="default", selected="selected">Any difficulty</option>
+                        <option value="Beginners">Beginner</option>
+                        <option value="Intermediates">Intermediate</option>
+                        <option value="Experts">Expert</option>
+                    </select>
+                    <select name="Cook time" id="Cook-time">
+                        <option value="default", selected="selected">Any cook time</option>
+                        <option value="Less than 10 min">Less than 10 min.</option>
+                        <option value="Less than 30 min">Less than 30 min.</option>
+                        <option value="Less than 1 h">Less than 1 h.</option>
+                        <option value="More than 1 h">Longer than 1h.</option>
+                    </select>
+                    <div class="photo-buttons">
+                        <button id="add-photo-button">Add Photo</button>
+                        <button id="scan-camera-button">Scan Object with Camera</button>
+                    </div>
+                </div>
+                <div class="options-container-horizontal">
+                    <textarea id="chat-input" placeholder="Type your message..." maxlength="300"></textarea>
+                        <label>Use extra ingredients</label>
+                        <label class="switch">
+                            <input type="checkbox" id="ingredients-toggle">
+                            <span class="slider round"></span>
+                        </label>    
+                    <button id="send-button">Send</button>
+                </div>
+                <div class="options-container-horizontal">
+                    <div class="char-counter">
+                        <span id="char-count">0</span>/300
+                    </div>
+                    <div id="limit-error" class="error-message">You have reached the maximum character limit (300).</div>
+                </div>
+                <div class="options-container-horizontal">
+                    <button class="clear-chat-button" id="clear-chat-button">Clear Chat</button>
+                </div>
             </div>
-            <div class="photo-buttons">
-                <button id="add-photo-button">Add Photo</button>
-                <button id="scan-camera-button">Scan Object with Camera</button>
-            </div>
-            <button id="send-button">Send</button>
         </div>
         <!-- Character Counter -->
-        <div class="char-counter">
-            <span id="char-count">0</span>/300
-        </div>
+        
         <!-- Error Messages -->
-        <div id="limit-error" class="error-message">You have reached the maximum character limit (300).</div>
 
         <!-- Clear Chat Button -->
-        <button class="clear-chat-button" id="clear-chat-button">Clear Chat</button>
     </div>
     <!-- Modal Structure -->
     <div id="upload-modal" class="modal">
@@ -460,9 +122,9 @@
         </div>
     </div>
     <script type="module" >
-            import { GoogleGenerativeAI } from "https://cdn.skypack.dev/@google/generative-ai";
-            console.log("GoogleGenerativeAI loaded:", GoogleGenerativeAI);
-        // JavaScript for handling button clicks
+        
+        let useExtraIngredients = false;
+
         document.getElementById("add-photo-button").addEventListener("click", function () {
             document.getElementById("upload-modal").style.display = "flex"; // Open the modal
         });
@@ -492,6 +154,16 @@
             }
 
         const csrftoken = getCookie('csrftoken');
+
+        document.getElementById("ingredients-toggle").addEventListener("change", function() {
+            if (this.checked) {
+                alert("Ingredients list will be included in the response.");
+                useExtraIngredients = true;
+            } else {
+                alert("Ingredients list will NOT be included in the response.");
+                useExtraIngredients = false;
+            }
+        });
 
         document.getElementById('send-button').addEventListener('click', async function() {
             const chatInput = document.getElementById('chat-input');
@@ -609,42 +281,49 @@
             
             // Display response
             if (geminiResponse) {
-                const botMessage = document.createElement('div');
-                botMessage.className = 'message bot';
-                botMessage.textContent = geminiResponse;
-                
-                const saveBtn = document.createElement('button');
-                saveBtn.className = 'edit-button';
-                saveBtn.textContent = 'Save as PDF';
-                saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
-                botMessage.appendChild(saveBtn);
-                
-                chatMessages.appendChild(botMessage);
+                geminiResponse.recipes.forEach((recipe) => {
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'message bot';
+                    botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>
+                                            Cooking Time: ${recipe.cookingTime}<br/>
+                                            <strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>
+                                            <strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
+                    
+                    const saveBtn = document.createElement('button');
+                    saveBtn.className = 'edit-button';
+                    saveBtn.textContent = 'Save as PDF';
+                    saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
+                    botMessage.appendChild(saveBtn);
+                    
+                    chatMessages.appendChild(botMessage);
 
-                try {
-                    fetch("{% url 'save_recipe' %}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRFToken": csrftoken,
-                            "Content-Type": "application/x-www-form-urlencoded",
-                        },
-                        body: "text=" + encodeURIComponent(geminiResponse),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log("Saved with id:", data.id);
-                        } else {
-                            console.error("Error:", data);
-                        }
-                    });
-                } catch (error) {
-                    console.error("Error:", error);
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'message bot';
-                    errorMsg.textContent = "⚠️ Error: " + error.message;
-                    chatMessages.appendChild(errorMsg);
-                }
+                    try {
+                        fetch("{% url 'save_recipe' %}", {
+                            method: "POST",
+                            headers: {
+                                "X-CSRFToken": csrftoken,
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(recipe),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                console.log("Saved with id:", data.id);
+                            } else {
+                                console.error("Error:", data);
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Error:", error);
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'message bot';
+                        errorMsg.textContent = "⚠️ Error: " + error.message;
+                        chatMessages.appendChild(errorMsg);
+                    }
+                });
+//xdxdxdxd
+                
             }
             
             // Clear image preview after everything is done
@@ -902,33 +581,28 @@
             modal.style.display = "none";
         }
 
-      async function sendPrompt(userPrompt){
-        const genAI = new GoogleGenerativeAI(atob("QUl6YVN5RGYzNWd2SWVzT01XTFJJeHB3blFuOUc1MEpJOVpsTkNz"));
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const prompt = userPrompt;
-        
-        const result = await model.generateContent(prompt);
-        console.log(result.response.text());
-        return result.response.text();
-      }
-
       async function sendUserPrompt(text) {
-        var templatePrompt1 = "Generate 3 recipes using these ingredients: ";
-        var templatePrompt2 = ". "
-        var mealTime = document.getElementById("Meal-time").value 
-        if(mealTime != "default")
-          templatePrompt2 += "These must be " + mealTime + "recipes";
-        var mealType = document.getElementById("Meal-type").value
-        if(mealType != "default")
-          templatePrompt2 += " for a " + mealType;
-        var mealDiff = document.getElementById("Difficulty").value
-        if(mealDiff != "default")
-          templatePrompt2 += " meant to be cooked by " + mealDiff;
-        var cookTime = document.getElementById("Cook-time").value
-        if(cookTime != "default")
-          templatePrompt2 += " that is made in " + cookTime;
-        var templatePrompt4 = ". One of these recipes must made with only the mentioned ingredients and nothing more. Your recipes must include the name of the dish, cooking time, ingredients and instructions. Your reply text should only consist of the recipes and nothing more.";
-        return await sendPrompt(templatePrompt1 + templatePrompt2 + text + templatePrompt4);
+        let data = {
+            "promptType": "default",
+            "ingredients": text,
+            "mealTime": document.getElementById("Meal-time").value,
+            "mealType": document.getElementById("Meal-type").value,
+            "mealDiff": document.getElementById("Difficulty").value,
+            "cookingTime": document.getElementById("Cook-time").value,
+            "useExtraIngredients": useExtraIngredients
+        };
+        let response = await fetch("{% url 'send_prompt' %}", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(data)
+        });
+        let responseData = await response.json();
+        responseData = JSON.parse(responseData.data);
+       return responseData;
       }
     </script>
 </body>
