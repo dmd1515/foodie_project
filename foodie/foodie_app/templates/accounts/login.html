@@ -1,9 +1,27 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Login</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Log in</button>
-</form>
-{% endblock %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Auth Demo</title>
+    <link rel="stylesheet" href ="{% static 'styles.css' %}" />
+
+</head>
+<body>
+    <div class = "loginPage">
+        <form method="post">
+            <h2>Login</h2>
+            {% csrf_token %}
+            <p>
+                <label for="id_username">Username:</label> 
+                <input type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="id_username">
+            </p>
+            <p>
+                <label for="id_password">Password:</label> 
+                <input type="password" name="password" autocomplete="current-password" required="" id="id_password">
+            </p>
+            <button type="submit">Log in</button>
+            <p class="signup-link">Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+        </form>
+    </div>
+</body>
