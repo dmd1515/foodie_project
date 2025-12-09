@@ -206,14 +206,14 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centruojame turinį horizontaliai */
+    align-items: left; /* Centruojame turinį horizontaliai */
 }
 
 .sidebar h1 {
     font-size: 2rem;
     margin-bottom: 20px;
     text-transform: uppercase; /* Pavadinimas didžiosiomis raidėmis */
-    text-align: center; /* Centruojame tekstą */
+    text-align: left; /* Centruojame tekstą */
     color: #fff; /* Baltas tekstas */
 }
 
