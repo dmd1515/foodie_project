@@ -250,17 +250,7 @@
             botMessage.appendChild(tagBtn);
             
             chatMessages.appendChild(botMessage);
-    
 
-    function SaveRecipeAsPDF(messageElement) {
-          const doc = new jsPDF();
-          const text = messageElement.textContent;
-  
-          doc.setFontSize(8);
-          doc.text(text, 10, 10);
-          // force download
-          doc.save('Recipe.pdf');
-        }
 
     function openTagEdit(tag, buttonElement, recipeId) {
         const messageText = tag;
