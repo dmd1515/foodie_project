@@ -124,6 +124,8 @@
     <script type="module" >
         
         let useExtraIngredients = false;
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('chat-messages');
 
         document.getElementById("add-photo-button").addEventListener("click", function () {
             document.getElementById("upload-modal").style.display = "flex"; // Open the modal
@@ -166,8 +168,7 @@
         });
 
         document.getElementById('send-button').addEventListener('click', async function() {
-            const chatInput = document.getElementById('chat-input');
-            const chatMessages = document.getElementById('chat-messages');
+
             const messageText = chatInput.value.trim();
             
             // Check if we have input
@@ -186,6 +187,13 @@
             
             if (messageText) {
                 userMessage.textContent = messageText;
+                let editButton = document.createElement('button');
+                editButton.className = 'edit-button';
+                editButton.textContent = 'Edit';
+                editButton.addEventListener('click', function() {
+                    editMessage(userMessage);
+                });
+                userMessage.appendChild(editButton);
             }
             
             if (selectedImageFile) {
@@ -281,7 +289,20 @@
             
             // Display response
             if (geminiResponse) {
-                geminiResponse.recipes.forEach((recipe) => {
+                displayResponse(geminiResponse, chatMessages);
+            }
+            
+            // Clear image preview after everything is done
+            document.getElementById("image-preview").style.display = "none";
+            const fileNameDisplay = document.getElementById("file-name-display");
+            if (fileNameDisplay) fileNameDisplay.remove();
+            selectedImageFile = null;
+            // Reset the character counter
+            document.getElementById('char-count').textContent = '0';
+        });
+
+        function displayResponse(resposne, chatMessages){
+            resposne.recipes.forEach((recipe) => {
                     const botMessage = document.createElement('div');
                     botMessage.className = 'message bot';
                     botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>` +
@@ -322,18 +343,7 @@
                         chatMessages.appendChild(errorMsg);
                     }
                 });
-//xdxdxdxd
-                
-            }
-            
-            // Clear image preview after everything is done
-            document.getElementById("image-preview").style.display = "none";
-            const fileNameDisplay = document.getElementById("file-name-display");
-            if (fileNameDisplay) fileNameDisplay.remove();
-            selectedImageFile = null;
-            // Reset the character counter
-            document.getElementById('char-count').textContent = '0';
-        });
+        }
 
         // Edit message logic
         function editMessage(messageElement) {
@@ -353,9 +363,20 @@
             saveButton.style.padding = '5px 10px';
             saveButton.style.borderRadius = '4px';
             saveButton.style.cursor = 'pointer';
+            
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.backgroundColor = '#ff0000';
+            cancelButton.style.color = '#fff';
+            cancelButton.style.border = 'none';
+            cancelButton.style.padding = '5px 10px';
+            cancelButton.style.borderRadius = '4px';
+            cancelButton.style.cursor = 'pointer';
+            cancelButton.style.marginLeft = '10px';
 
             const editCharCounter = document.createElement('div');
             editCharCounter.className = 'char-counter';
+            editCharCounter.style.color = '#fff';
             editCharCounter.innerHTML = `<span id="edit-char-count">${messageText.length}</span>/300`;
 
             // Replace message content with input, counter, and save button
@@ -363,6 +384,7 @@
             messageElement.appendChild(editInput);
             messageElement.appendChild(editCharCounter);
             messageElement.appendChild(saveButton);
+            messageElement.appendChild(cancelButton);
 
             // Update character counter while editing
             editInput.addEventListener('input', function() {
@@ -373,12 +395,12 @@
                 if (currentLength >= 280) {
                     editCharCounter.style.color = 'red';
                 } else {
-                    editCharCounter.style.color = '#666';
+                    editCharCounter.style.color = '#fff';
                 }
             });
 
             // Save the edited message
-            saveButton.addEventListener('click', function() {
+            saveButton.addEventListener('click', async function() {
                 const newText = editInput.value.trim();
                 if (newText) {
                     messageElement.textContent = newText;
@@ -389,7 +411,25 @@
                         editMessage(messageElement);
                     });
                     messageElement.appendChild(editButton);
+
+                    if (messageText) {
+                        let geminiResponse = await sendUserPrompt(messageText);
+                        if (geminiResponse) {
+                            displayResponse(geminiResponse, chatMessages);
+                        }
+                    }
                 }
+            });
+
+            cancelButton.addEventListener('click', function() {
+                messageElement.textContent = messageText;
+                const editButton = document.createElement('button');
+                editButton.className = 'edit-button';
+                editButton.textContent = 'Edit';
+                editButton.addEventListener('click', function() {
+                    editMessage(messageElement);
+                });
+                messageElement.appendChild(editButton);
             });
         }
 
