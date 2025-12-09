@@ -284,10 +284,10 @@
                 geminiResponse.recipes.forEach((recipe) => {
                     const botMessage = document.createElement('div');
                     botMessage.className = 'message bot';
-                    botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>
-                                            Cooking Time: ${recipe.cookingTime}<br/>
-                                            <strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>
-                                            <strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
+                    botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>` +
+                                            `Cooking Time: ${recipe.cookingTime}<br/>` +
+                                            `<strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>` +
+                                            `<strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
                     
                     const saveBtn = document.createElement('button');
                     saveBtn.className = 'edit-button';
