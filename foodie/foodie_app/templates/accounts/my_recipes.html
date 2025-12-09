@@ -50,10 +50,29 @@
 
     const container = document.getElementById('recipes-container');
 
+    function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+        const csrftoken = getCookie('csrftoken');
+
     recipes.forEach((recipe) => {
         const botMessage = document.createElement('div');
             botMessage.className = 'message bot';
             botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>` +
+                                (recipe.tag != '' ? `<em id="recipe${recipe.id}">Tag: ${recipe.tag}</em><br/>` : `<em id="recipe${recipe.id}"></em>`) +
                                 `Cooking Time: ${recipe.cookingTime}<br/>` +
                                 `<strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>` +
                                 `<strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
@@ -63,6 +82,13 @@
             saveBtn.textContent = 'Save as PDF';
             saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
             botMessage.appendChild(saveBtn);
+
+            const tagBtn = document.createElement('button');
+            tagBtn.className = 'edit-button';
+            tagBtn.style.top = '20px';
+            tagBtn.textContent = 'Tag';
+            tagBtn.addEventListener('click', () => openTagEdit(recipe.tag, tagBtn, recipe.id));
+            botMessage.appendChild(tagBtn);
             
             chatMessages.appendChild(botMessage);
     });
@@ -76,5 +102,92 @@
           // force download
           doc.save('Recipe.pdf');
         }
+
+    function openTagEdit(tag, buttonElement, recipeId) {
+        const messageText = tag;
+        const container = document.createElement('div');
+
+        const editInput = document.createElement('textarea');
+        editInput.value = messageText;
+        editInput.style.width = '100%';
+        editInput.style.height = '60px';
+        editInput.maxLength = 300; // Set max length for the textarea
+
+        const saveButton = document.createElement('button');
+        saveButton.textContent = 'Save';
+        saveButton.style.backgroundColor = '#28a745';
+        saveButton.style.color = '#fff';
+        saveButton.style.border = 'none';
+        saveButton.style.padding = '5px 10px';
+        saveButton.style.borderRadius = '4px';
+        saveButton.style.cursor = 'pointer';
+        
+        const cancelButton = document.createElement('button');
+        cancelButton.textContent = 'Cancel';
+        cancelButton.style.backgroundColor = '#ff0000';
+        cancelButton.style.color = '#fff';
+        cancelButton.style.border = 'none';
+        cancelButton.style.padding = '5px 10px';
+        cancelButton.style.borderRadius = '4px';
+        cancelButton.style.cursor = 'pointer';
+        cancelButton.style.marginLeft = '10px';
+
+        const editCharCounter = document.createElement('div');
+        editCharCounter.className = 'char-counter-small';
+        editCharCounter.style.color = '#000';
+        editCharCounter.innerHTML = `<span id="edit-char-count">${messageText.length}</span>/300`;
+
+        // Replace message content with input, counter, and save button
+        const originalButton = buttonElement;
+
+        container.appendChild(editInput);
+        container.appendChild(editCharCounter);
+        container.appendChild(saveButton);
+        container.appendChild(cancelButton);
+
+        const parent = originalButton.parentNode;
+        parent.replaceChild(container, originalButton);
+
+        // Update character counter while editing
+        editInput.addEventListener('input', function() {
+            const currentLength = editInput.value.length;
+            document.getElementById('edit-char-count').textContent = currentLength;
+
+            // Optional: Change color if approaching the limit
+            if (currentLength >= 280) {
+                editCharCounter.style.color = 'red';
+            } else {
+                editCharCounter.style.color = '#000';
+            }
+        });
+
+        // Save the edited message
+        saveButton.addEventListener('click', async function() {
+            parent.replaceChild(originalButton, container);
+            await sendTag(editInput.value, recipeId); // Replace 1 with actual recipe ID
+            
+            let tagField = document.getElementById(`recipe${recipeId}`)
+            tagField.innerText = `Tag: ${editInput.value}\n`;
+        });
+
+        cancelButton.addEventListener('click', function() {
+            parent.replaceChild(originalButton, container);
+        });
+    }
+
+    async function sendTag(newTag, recipeId){
+        let data = { 
+            "tag": newTag,
+        };
+        let response = await fetch(`/edit-recipe/${recipeId}/`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(data)
+        });
+    }
 </script>
 </html>

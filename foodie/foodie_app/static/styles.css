@@ -309,6 +309,7 @@ body {
     font-size: 0.8rem;
 }
 
+
 .chat-messages .message.user .edit-button {
     color: #fff;
 }
@@ -411,6 +412,11 @@ body {
     font-size: 0.9rem;
     color: #666;
     margin-top: 5px;
+}
+
+.char-counter-small{
+    font-size: 0.9rem;
+    color: #666;
 }
 
 

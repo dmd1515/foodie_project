@@ -155,6 +155,7 @@ def my_recipes(request):
 
         recipes_data.append({
             "id": r.id,
+            "tag": r.tag,
             "name": r.title,
             "cookingTime": r.cookingTime,
             "ingredients": ingredients,     
@@ -181,3 +182,21 @@ def send_prompt(request):
         return JsonResponse({'success': True, 'data':responseData})
     return JsonResponse({'error': 'Invalid request.'}, status=400)
 
+@login_required
+def edit_recipe(request, recipe_id):
+    try:
+        recipe = GeneratedRecipe.objects.get(id=recipe_id, user=request.user)
+    except GeneratedRecipe.DoesNotExist:
+        return JsonResponse({'error': 'Recipe not found.'}, status=404)
+
+    if request.method == "POST":
+        data = json.loads(request.body)
+        recipe.tag = data.get('tag', recipe.tag)
+        recipe.title = data.get('name', recipe.title)
+        recipe.cookingTime = data.get('cookingTime', recipe.cookingTime)
+        recipe.ingredients = data.get('ingredients', recipe.ingredients)
+        recipe.instructions = data.get('instructions', recipe.instructions)
+        recipe.save()
+        return JsonResponse({'success': True})
+
+    return JsonResponse({'error': 'Invalid request.'}, status=400)
