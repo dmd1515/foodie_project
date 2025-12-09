@@ -61,6 +61,25 @@
 </div>
 
 </div>
+
+<div id="tag-add-modal" class="tag-modal">
+        <div class="tag-modal-content">
+            <h4 id="tag-add-modal-header">Add tag</h4>
+            <form id="tag-add-form" action="{% url 'upload_image' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- File input and image preview -->
+                <div class="card-actions">
+                    <label for="tagInput">Tag</label>
+                    <input type="text" id="tagInput" name="tagInput"/>
+                </div>
+                <!-- Upload and close buttons -->
+                <div class="button-container">
+                    <button type="button" class="add-tag">Add tag</button>
+                    <button type="button" class="cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 
 
@@ -147,11 +166,7 @@
     doc.save(`${title}.pdf`);
   }
 
-  // Pagrindinė funkcija – perpiešti korteles su (ar be) datos filtro
-  function renderRecipes(filterDate = null) {
-    grid.innerHTML = "";
-
-    function getCookie(name) {
+  function getCookie(name) {
                 let cookieValue = null;
                 if (document.cookie && document.cookie !== '') {
                     const cookies = document.cookie.split(';');
@@ -167,7 +182,13 @@
                 return cookieValue;
             }
 
-        const csrftoken = getCookie('csrftoken');
+  // Pagrindinė funkcija – perpiešti korteles su (ar be) datos filtro
+  function renderRecipes(filterDate = null) {
+    grid.innerHTML = "";
+
+    
+
+    const csrftoken = getCookie('csrftoken');
 
     recipes.forEach((recipe) => {
       const recipeDate = getRecipeDate(recipe);
@@ -220,10 +241,40 @@
       const saveBtn = card.querySelector(".save-btn");
       // čia perduodam ne kortelę, o RECEPTĄ
       saveBtn.addEventListener("click", () => SaveRecipeAsPDF(recipe));
+      
+      setupModal(card, recipe);
 
       grid.appendChild(card);
     });
   } 
+
+     function setupModal(card, recipe){
+        if(recipe.tag == ""){
+            const tagAddBtn = card.querySelector(".tag-add-btn");
+            tagAddBtn.addEventListener("click", () => {
+                document.getElementById("tag-add-modal").style.display = "flex";
+            });
+        } else {
+            const tagAddBtn = card.querySelector(".tag-add-btn");
+            tagAddBtn.addEventListener("click", () => {
+                document.getElementById("tag-add-modal").style.display = "flex";
+                document.getElementById("tag-add-modal-header").innerText = "Edit tag";
+                document.querySelector(".add-tag").innerText = "Save changes";
+            });
+            const tagDelBtn = card.querySelector(".tag-del-btn");
+            tagDelBtn.addEventListener("click", () => {
+                sendTag('', recipe.id);
+                card.querySelector(".card-actions").innerHTML = `
+                <button class="tag-add-btn" type="button">Add Tag</button>
+                <button class="save-btn" type="button">Save as PDF</button>
+                `;
+            });
+            
+        }
+        document.querySelector(".cancel-btn").addEventListener("click", () => {
+            document.getElementById("tag-add-modal").style.display = "none";
+        });
+    }
 
   // Inicinis atvaizdavimas – visi receptai
   renderRecipes();
@@ -235,30 +286,7 @@
       renderRecipes(selected);
     });
   }
-        const botMessage = document.createElement('div');
-            botMessage.className = 'message bot';
-            botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>` +
-                                (recipe.tag != '' ? `<em id="recipe${recipe.id}">Tag: ${recipe.tag}</em><br/>` : `<em id="recipe${recipe.id}"></em>`) +
-                                `Cooking Time: ${recipe.cookingTime}<br/>` +
-                                `<strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>` +
-                                `<strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
-                    
-            const saveBtn = document.createElement('button');
-            saveBtn.className = 'edit-button';
-            saveBtn.textContent = 'Save as PDF';
-            saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
-            botMessage.appendChild(saveBtn);
-
-            const tagBtn = document.createElement('button');
-            tagBtn.className = 'edit-button';
-            tagBtn.style.top = '20px';
-            tagBtn.textContent = 'Tag';
-            tagBtn.addEventListener('click', () => openTagEdit(recipe.tag, tagBtn, recipe.id));
-            botMessage.appendChild(tagBtn);
-            
-            chatMessages.appendChild(botMessage);
-
-
+        
     function openTagEdit(tag, buttonElement, recipeId) {
         const messageText = tag;
         const container = document.createElement('div');
@@ -351,6 +379,7 @@
     }
 
     async function sendTag(newTag, recipeId){
+        const csrftoken = getCookie('csrftoken');
         let data = { 
             "tag": newTag,
         };
