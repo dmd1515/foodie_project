@@ -62,12 +62,13 @@ def sendPrompt(data):
         prompt = generatePrompt(data)
     if(data["promptType"] == "TOP"):
         prompt = generateTOPPrompt(data)
-    client = genai.Client(api_key=base64.b64decode("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"))
-    response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=prompt
-    )
-    responseData = response.text
-    
+    #client = genai.Client(api_key=base64.b64decode("QUl6YVN5QWM3S2ZGYlF6RG5LajVwQ1FlcWpoWWFMLXd4WEliLXRR"))
+    #response = client.models.generate_content(
+    #    model="gemini-2.5-flash", contents=prompt
+    #)
+    #responseData = response.text
+    responseData = generateDummyRecipes()
+
     return trimResponse(responseData)
 
 def generateDummyRecipes():

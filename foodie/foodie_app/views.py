@@ -98,11 +98,8 @@ def signup(request):
 
 @login_required
 def delete_account(request):
-    if request.method == 'POST':
-        user = request.user
-        #logout(request)
-        user.delete()
-        return redirect('login')  # or some "account deleted" page
+    user = request.user
+    user.delete()
     return render(request, 'accounts/login.html')
 
 @login_required

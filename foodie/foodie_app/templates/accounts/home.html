@@ -18,23 +18,22 @@
         <ul>
             <li><a href="">Home</a></li>
             <li><a href="my-recipes/">Recipes</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
             <li><a href="top_recipes">TOP Recipes</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+            <li><a href="{% url 'delete_account' %}" >Delete Account</a></li>
         </ul>
-        <form id="remove account" action ="{% url 'delete_account' %}" method="post" style="position:fixed; bottom:20px;">
-            {% csrf_token %}
-            <input type="submit" name="Remove account" value="Remove account" class="clear-chat-button"></input>
-            
-        </form>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="chat-area">
+        <div>
             <h2>Chat with Foodie</h2> <!-- Pakeistas tekstas ir stilius -->
+        </div>
+        <div class="chat-area">
+            
             <div class="chat-messages" id="chat-messages">
                 <!-- Example messages -->
-                <div class="message bot" id="initial-message-1">Hello! How can I help you todaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy?</div>
+                <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
             </div>
         </div>
 
