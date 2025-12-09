@@ -189,7 +189,7 @@
           <div>
             <h4 class="recipe-title">${title}</h4>
             <p class="recipe-subtitle">
-              ${recipeDate || ""}
+              ${recipeDate || ""} ${recipe.tag == '' ? '' : 'Tag: ' + recipe.tag}
             </p>
           </div>
           <button class="icon-button" type="button">🍽</button>
@@ -206,6 +206,13 @@
         </div>
 
         <div class="card-actions">
+            ${
+            recipe.tag == ""
+              ? `<button class="tag-add-btn" type="button">Add Tag</button>`
+              : `<button class="tag-del-btn" type="button">Remove Tag</button>
+              <button class="tag-add-btn" type="button">Change Tag</button>
+              `
+          }
           <button class="save-btn" type="button">Save as PDF</button>
         </div>
       `;
@@ -216,7 +223,7 @@
 
       grid.appendChild(card);
     });
-  }
+  } 
 
   // Inicinis atvaizdavimas – visi receptai
   renderRecipes();

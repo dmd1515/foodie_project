@@ -285,6 +285,7 @@ body {
   display: flex;
   justify-content: flex-end;
   margin-top: 8px;
+  gap: 5px;
 }
 
 .save-btn {
@@ -299,4 +300,32 @@ body {
 
 .save-btn:hover {
   background: #020617;
+}
+
+.tag-add-btn {
+  border: none;
+  background: #111827;
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tag-add-btn:hover {
+  background: #020617;
+}
+
+.tag-del-btn {
+  border: none;
+  background: #ce0000;
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tag-del-btn:hover {
+  background: #bd0000;
 }
