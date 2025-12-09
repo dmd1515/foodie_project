@@ -13,12 +13,12 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+     <div class="sidebar">
         <h1>FOODIE</h1>
         <ul>
-            <li><a href="">Home</a></li>
-            <li><a href="my-recipes/">Recipes</a></li>
-            <li><a href="top_recipes">TOP Recipes</a></li>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'my_recipes' %}">Recipes</a></li>
+            <li><a href="{% url 'top_recipes' %}">TOP Recipes</a></li>
             <li><a href="{% url 'logout' %}">Logout</a></li>
             <li><a href="{% url 'delete_account' %}" >Delete Account</a></li>
         </ul>
@@ -39,64 +39,67 @@
 
         <!-- Chat Input and Buttons -->
         <div class="chat-input-container">
-            <textarea id="chat-input" placeholder="Type your message..." maxlength="300"></textarea>
-            <div class="options-container-vertical"> 
-              <div class="options-container-horizontal">
+            <div class="options-container-vertical">
+                <div class="options-container-horizontal">
                     <select name="Meal time" id="Meal-time">
-                    <option value="default", selected="selected">Any time</option>
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Dinner">Dinner</option>
-                    <option value="Night snack">Night snack</option>
-                </select>
-                <select name="Meal type" id="Meal-type">
-                    <option value="default", selected="selected">Any type</option>
-                    <option value="Main dish">Main dish</option>
-                    <option value="Side dish">Side dish</option>
-                    <option value="Desert">Desert</option>
-                    <option value="Soup">Soup</option>
-                    <option value="non-Alcohol drink">Alcohol-free drink</option>
-                    <option value="Alcohol drink">Alcohol drink</option>
-                </select>
-              </div>
-            <div class="options-container-horizontal">
-              <select name="Difficulty" id="Difficulty">
-                <option value="default", selected="selected">Any difficulty</option>
-                <option value="Beginners">Beginner</option>
-                <option value="Intermediates">Intermediate</option>
-                <option value="Experts">Expert</option>
-              </select>
-              <select name="Cook time" id="Cook-time">
-                <option value="default", selected="selected">Any cook time</option>
-                <option value="Less than 10 min">Less than 10 min.</option>
-                <option value="Less than 30 min">Less than 30 min.</option>
-                <option value="Less than 1 h">Less than 1 h.</option>
-                <option value="More than 1 h">Longer than 1h.</option>
-              </select>
+                        <option value="default", selected="selected">Any time</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Night snack">Night snack</option>
+                    </select>
+                    <select name="Meal type" id="Meal-type">
+                        <option value="default", selected="selected">Any type</option>
+                        <option value="Main dish">Main dish</option>
+                        <option value="Side dish">Side dish</option>
+                        <option value="Desert">Desert</option>
+                        <option value="Soup">Soup</option>
+                        <option value="non-Alcohol drink">Alcohol-free drink</option>
+                        <option value="Alcohol drink">Alcohol drink</option>
+                    </select>
+                    <select name="Difficulty" id="Difficulty">
+                        <option value="default", selected="selected">Any difficulty</option>
+                        <option value="Beginners">Beginner</option>
+                        <option value="Intermediates">Intermediate</option>
+                        <option value="Experts">Expert</option>
+                    </select>
+                    <select name="Cook time" id="Cook-time">
+                        <option value="default", selected="selected">Any cook time</option>
+                        <option value="Less than 10 min">Less than 10 min.</option>
+                        <option value="Less than 30 min">Less than 30 min.</option>
+                        <option value="Less than 1 h">Less than 1 h.</option>
+                        <option value="More than 1 h">Longer than 1h.</option>
+                    </select>
+                    <div class="photo-buttons">
+                        <button id="add-photo-button">Add Photo</button>
+                        <button id="scan-camera-button">Scan Object with Camera</button>
+                    </div>
+                </div>
+                <div class="options-container-horizontal">
+                    <textarea id="chat-input" placeholder="Type your message..." maxlength="300"></textarea>
+                        <label>Use extra ingredients</label>
+                        <label class="switch">
+                            <input type="checkbox" id="ingredients-toggle">
+                            <span class="slider round"></span>
+                        </label>    
+                    <button id="send-button">Send</button>
+                </div>
+                <div class="options-container-horizontal">
+                    <div class="char-counter">
+                        <span id="char-count">0</span>/300
+                    </div>
+                    <div id="limit-error" class="error-message">You have reached the maximum character limit (300).</div>
+                </div>
+                <div class="options-container-horizontal">
+                    <button class="clear-chat-button" id="clear-chat-button">Clear Chat</button>
+                </div>
             </div>
-            <div class="options-container-horizontal">
-                <label>Allow other ingredients</label>
-                <label class="switch">
-                    <input type="checkbox" id="ingredients-toggle">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-            </div>
-            <div class="photo-buttons">
-                <button id="add-photo-button">Add Photo</button>
-                <button id="scan-camera-button">Scan Object with Camera</button>
-            </div>
-            <button id="send-button">Send</button>
         </div>
         <!-- Character Counter -->
-        <div class="char-counter">
-            <span id="char-count">0</span>/300
-        </div>
+        
         <!-- Error Messages -->
-        <div id="limit-error" class="error-message">You have reached the maximum character limit (300).</div>
 
         <!-- Clear Chat Button -->
-        <button class="clear-chat-button" id="clear-chat-button">Clear Chat</button>
     </div>
     <!-- Modal Structure -->
     <div id="upload-modal" class="modal">
