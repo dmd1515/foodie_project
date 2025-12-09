@@ -435,12 +435,21 @@
 
         function SaveRecipeAsPDF(messageElement) {
           const doc = new jsPDF();
-          const text = messageElement.textContent;
+          const html = messageElement.innerHTML;
   
-          doc.setFontSize(8);
-          doc.text(text, 10, 10);
-          // force download
-          doc.save('Recipe.pdf');
+            const text = html
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<\/?strong>/gi, '')
+                .replace("<button class=\"edit-button\">Save as PDF</button>", '\n');
+
+            // Split into lines for jsPDF
+            const lines = text.split('\n');
+
+            doc.setFontSize(10);
+            // jsPDF supports an array of lines for multi-line text
+            doc.text(lines, 10, 10);
+
+            doc.save('Recipe.pdf');
         }
 
         // Clear chat logic
