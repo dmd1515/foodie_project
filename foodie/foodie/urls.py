@@ -36,6 +36,7 @@ urlpatterns = [
     path('save-recipe/', views.save_generated_recipe, name='save_recipe'),
     path('my-recipes/', views.my_recipes, name='my_recipes'),
     path('send-prompt/', views.send_prompt, name='send_prompt'),
+    path('edit-recipe/<int:recipe_id>/', views.edit_recipe, name='edit_recipe'),
 ]
 
 

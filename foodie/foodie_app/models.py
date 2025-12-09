@@ -19,6 +19,7 @@ class TemporaryImage(models.Model):
 
 class GeneratedRecipe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='generated_recipes')
+    tag = models.TextField()
     title = models.TextField()
     cookingTime = models.TextField()
     ingredients = models.TextField()
