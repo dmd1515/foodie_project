@@ -109,6 +109,9 @@ def delete_account(request):
 def home(request):
     return render(request, 'accounts/home.html')
 
+def styles(request):
+    return render(request, 'styles/styles.css')
+
 @login_required
 @require_POST
 def save_generated_recipe(request):

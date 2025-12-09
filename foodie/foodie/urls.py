@@ -26,6 +26,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('signup/', views.signup, name='signup'),
     path('', views.home, name='home'),
+    path('styles.css', views.styles, name='styles'),
     path('top_recipes/', views.top_recipes, name='top_recipes'),
     path('upload/', views.upload_image, name='upload_image'),
     path('send-message/', send_message, name='send_message'),
