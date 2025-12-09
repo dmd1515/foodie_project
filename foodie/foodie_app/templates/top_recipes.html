@@ -1,0 +1,135 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foodie - Chat Layout</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>    </script>
+    <link rel="stylesheet" href ="{% static 'styles.css' %}" />
+</head>
+<body>
+    <!-- Sidebar -->
+   <div class="sidebar">
+        <h1>FOODIE</h1>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'my_recipes' %}">Recipes</a></li>
+            <li><a href="{% url 'top_recipes' %}">TOP Recipes</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+            <li><a href="{% url 'delete_account' %}" >Delete Account</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="chat-area">
+            <h2>TOP Recipes</h2> <!-- Pakeistas tekstas ir stilius -->
+            <div class="chat-messages" id="chat-messages">
+                <!-- Example messages -->
+                <div class="message bot" id="initial-message-1">Generating...</div>
+            </div>
+        </div>
+
+    </div>
+    <script type="module" >
+        // JavaScript for handling button clicks
+        const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        const chatMessages = document.getElementById('chat-messages');
+        const csrftoken = getCookie('csrftoken');
+
+        function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+        document.addEventListener("DOMContentLoaded", 
+            createTOPRecipes
+        );
+
+        async function createTOPRecipes() {
+            const initialMessage = document.getElementById('initial-message-1');
+            let month = months[new Date().getMonth()];
+            let year = new Date().getFullYear();
+            let response = await sendPrompt(month, year);
+            if (initialMessage) initialMessage.remove();
+
+            response.recipes.forEach((recipe) => {
+            const botMessage = document.createElement('div');
+                botMessage.className = 'message bot';
+                     botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>` +
+                                            `Cooking Time: ${recipe.cookingTime}<br/>` +
+                                            `<strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>` +
+                                            `<strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
+                    
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'edit-button';
+                saveBtn.textContent = 'Save as PDF';
+                saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
+                botMessage.appendChild(saveBtn);
+                
+                chatMessages.appendChild(botMessage);
+
+                try {
+                        fetch("{% url 'save_recipe' %}", {
+                            method: "POST",
+                            headers: {
+                                "X-CSRFToken": csrftoken,
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(recipe),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                console.log("Saved with id:", data.id);
+                            } else {
+                                console.error("Error:", data);
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Error:", error);
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'message bot';
+                        errorMsg.textContent = "⚠️ Error: " + error.message;
+                        chatMessages.appendChild(errorMsg);
+                    }
+        });
+        }
+
+        async function sendPrompt(month, year){
+            let data = {
+                "promptType": "TOP",
+                "month": month,
+                "year": year,
+            };
+            let response = await fetch("{% url 'send_prompt' %}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(data)
+            });
+            let responseData = await response.json();
+            responseData = JSON.parse(responseData.data);
+            return responseData;
+      }
+    </script>
+</body>
+</html>
