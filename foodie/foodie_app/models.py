@@ -13,8 +13,6 @@ def validate_image_format(image):
         raise ValidationError("Only JPEG images are allowed.")
     
 class TemporaryImage(altModels.Model):
-    _id = altModels.ObjectIdField(primary_key=True)  # Mongo-style PK
-
     image = altModels.ImageField(
         upload_to='temp_images/',
         validators=[validate_image_size, validate_image_format]
