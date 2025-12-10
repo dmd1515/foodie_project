@@ -348,10 +348,11 @@ body {
     border-radius: 8px;
     width: 300px;
     text-align: center;
+    
 }
 
-.modal-content .add-tag,
-.modal-content .cancel-btn {
+.tag-modal-content .add-tag,
+.tag-modal-content .cancel-btn {
   padding: 10px 20px;
     border: none;
     border-radius: 4px;
@@ -360,13 +361,33 @@ body {
     flex: 1;
 }
 
-.modal-content .add-tag{
+.tag-modal-content .add-tag{
   background-color: #111827;
   color: #fff;
   margin-right: 10px;
 }
 
-.modal-content .cancel-btn {
+.tag-modal-content .cancel-btn {
   background-color: #ff0000;
   color: #fff;
+}
+
+
+.tag-modal-content input {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    resize: none;
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.tag-modal-content label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    text-align: left;
 }
