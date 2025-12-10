@@ -57,6 +57,7 @@ def trimResponse(responseText):
         return responseText
 
 def sendPrompt(data):
+    '''
     prompt = ""
     if(data["promptType"] == "default"):
         prompt = generatePrompt(data)
@@ -66,8 +67,9 @@ def sendPrompt(data):
     response = client.models.generate_content(
         model="gemini-2.5-flash", contents=prompt
     )
-    responseData = response.text
-    #responseData = generateDummyRecipes()
+'''
+    #responseData = response.text
+    responseData = generateDummyRecipes()
 
     return trimResponse(responseData)
 
