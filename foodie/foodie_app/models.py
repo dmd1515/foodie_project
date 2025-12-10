@@ -34,3 +34,17 @@ class GeneratedRecipe(models.Model):
     
     class Meta:
         db_table = 'generatedRecipes'
+class TopRecipe(models.Model):
+    name = models.TextField()
+    cookingTime = models.TextField()
+    ingredients = models.TextField()
+    instructions = models.TextField()
+
+    # The day for which this recipe is "top"
+    top_date = models.DateField()  # <-- NEW FIELD
+
+    # Optional: keep real creation time if you want
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'TopRecipes'

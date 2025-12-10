@@ -1,135 +1,406 @@
 {% load static %}
 
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Foodie - Chat Layout</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
-    </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>    </script>
-    <link rel="stylesheet" href ="{% static 'styles.css' %}" />
-</head>
-<body>
-    <!-- Sidebar -->
-   <div class="sidebar">
-        <h1>FOODIE</h1>
-        <ul>
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'my_recipes' %}">Recipes</a></li>
-            <li><a href="{% url 'top_recipes' %}">TOP Recipes</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-            <li><a href="{% url 'delete_account' %}" >Delete Account</a></li>
-        </ul>
-    </div>
+    <title>Foodie - Top Recipes</title>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="chat-area">
-            <h2>TOP Recipes</h2> <!-- Pakeistas tekstas ir stilius -->
-            <div class="chat-messages" id="chat-messages">
-                <!-- Example messages -->
-                <div class="message bot" id="initial-message-1">Generating...</div>
-            </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"
+      integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/"
+      crossorigin="anonymous"
+    ></script>
+
+    <link rel="stylesheet" href="{% static 'styles1.css' %}" />
+  </head>
+  <body>
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1>FOODIE</h1>
         </div>
 
+        <nav class="sidebar-nav">
+          <a
+            href="{% url 'home' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+          >
+            Home
+          </a>
+
+          <a
+            href="{% url 'my_recipes' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'my_recipes' %}active{% endif %}"
+          >
+            History
+          </a>
+
+          <a
+            href="{% url 'top_recipes' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'top_recipes' %}active{% endif %}"
+          >
+            Top Recipes
+          </a>
+
+          <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+          <a href="{% url 'delete_account' %}" class="nav-link danger"
+            >Delete Account</a
+          >
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="history-wrapper">
+          <div class="history-header">
+            <h2>Top Recipes</h2>
+            <div class="history-filters">
+              <!-- period select -->
+              <select id="period-select" class="date-input">
+                <option value="month" selected>Month</option>
+                <option value="day">Day</option>
+                <option value="year">Year</option>
+              </select>
+              <!-- only visible for "day" -->
+              <input
+                type="date"
+                id="day-input"
+                class="date-input"
+                style="display: none"
+              />
+              <button id="generate-btn" type="button" class="save-btn">
+                Generate
+              </button>
+            </div>
+          </div>
+
+          <section class="history-section">
+            <!-- label controlled by JS -->
+            <h3 class="section-title" id="section-label">
+              Please select a period
+            </h3>
+
+            <div class="recipes-grid" id="chat-messages">
+              <div class="message bot" id="initial-message-1">
+                Please select a period and press Generate.
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
-    <script type="module" >
-        // JavaScript for handling button clicks
-        const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-        const chatMessages = document.getElementById('chat-messages');
-        const csrftoken = getCookie('csrftoken');
 
-        function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
+    <script type="module">
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      const chatMessages = document.getElementById("chat-messages");
+      const periodSelect = document.getElementById("period-select");
+      const dayInput = document.getElementById("day-input");
+      const generateBtn = document.getElementById("generate-btn");
+      const sectionLabel = document.getElementById("section-label");
+      const csrftoken = getCookie("csrftoken");
+
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
             }
+          }
+        }
+        return cookieValue;
+      }
 
-        document.addEventListener("DOMContentLoaded", 
-            createTOPRecipes
-        );
+      // ═══ UI INIT ═══
+      document.addEventListener("DOMContentLoaded", () => {
+        // Initial UI state
+        chatMessages.innerHTML = `
+          <div class="message bot" id="initial-message-1">
+            Please select a period and press Generate.
+          </div>
+        `;
 
-        async function createTOPRecipes() {
-            const initialMessage = document.getElementById('initial-message-1');
-            let month = months[new Date().getMonth()];
-            let year = new Date().getFullYear();
-            let response = await sendPrompt(month, year);
-            if (initialMessage) initialMessage.remove();
-
-            response.recipes.forEach((recipe) => {
-            const botMessage = document.createElement('div');
-                botMessage.className = 'message bot';
-                     botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>` +
-                                            `Cooking Time: ${recipe.cookingTime}<br/>` +
-                                            `<strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>` +
-                                            `<strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
-                    
-                const saveBtn = document.createElement('button');
-                saveBtn.className = 'edit-button';
-                saveBtn.textContent = 'Save as PDF';
-                saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
-                botMessage.appendChild(saveBtn);
-                
-                chatMessages.appendChild(botMessage);
-
-                try {
-                        fetch("{% url 'save_recipe' %}", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRFToken": csrftoken,
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(recipe),
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                console.log("Saved with id:", data.id);
-                            } else {
-                                console.error("Error:", data);
-                            }
-                        });
-                    } catch (error) {
-                        console.error("Error:", error);
-                        const errorMsg = document.createElement('div');
-                        errorMsg.className = 'message bot';
-                        errorMsg.textContent = "⚠️ Error: " + error.message;
-                        chatMessages.appendChild(errorMsg);
-                    }
+        // Show date picker only for "day"
+        periodSelect.addEventListener("change", () => {
+          const period = periodSelect.value;
+          if (period === "day") {
+            dayInput.style.display = "inline-block";
+            if (!dayInput.value) {
+              dayInput.value = new Date().toISOString().slice(0, 10);
+            }
+          } else {
+            dayInput.style.display = "none";
+          }
         });
+
+        generateBtn.addEventListener("click", () => {
+          createTOPRecipes(); // generation starts ONLY here
+        });
+      });
+
+      // helper – parse list like "['A','B']" or array
+      function parseList(field) {
+        if (!field) return [];
+        if (Array.isArray(field)) return field;
+
+        try {
+          const jsonText = field.toString().replace(/'/g, '"');
+          const parsed = JSON.parse(jsonText);
+          if (Array.isArray(parsed)) return parsed;
+        } catch (e) {
+          return field
+            .toString()
+            .replace(/^\[/, "")
+            .replace(/\]$/, "")
+            .replace(/'/g, "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+        }
+        return [];
+      }
+
+      // ═══ PDF generation: only name + ingredients + instructions ═══
+      function SaveRecipeAsPDF(recipe) {
+        const doc = new jsPDF();
+
+        const title = recipe.name || "Recipe";
+        const ingredients = parseList(recipe.ingredients);
+        const instructions = parseList(recipe.instructions);
+
+        let lines = [];
+
+        lines.push(title);
+        lines.push("");
+
+        lines.push("Ingredients:");
+        ingredients.forEach((ing) => {
+          lines.push("- " + ing);
+        });
+
+        lines.push("");
+        lines.push("Instructions:");
+        instructions.forEach((step, i) => {
+          lines.push(`${i + 1}. ${step}`);
+        });
+
+        const text = lines.join("\n");
+        const split = doc.splitTextToSize(text, 180);
+
+        doc.setFontSize(10);
+        doc.text(split, 10, 10);
+        doc.save(`${title}.pdf`);
+      }
+
+      // Renders a list of recipes (same structure from DB or AI)
+      function renderRecipesList(recipes, period, month, year, dateLabel) {
+        chatMessages.innerHTML = "";
+
+        recipes.forEach((recipe) => {
+          const card = document.createElement("article");
+          card.className = "recipe-card";
+
+          const ingredientsHtml = parseList(recipe.ingredients)
+            .map((ing) => `- ${ing}`)
+            .join("<br/>");
+
+          const instructionsHtml = parseList(recipe.instructions)
+            .map((inst, index) => `${index + 1}. ${inst}`)
+            .join("<br/>");
+
+          const subtitle =
+            period === "day"
+              ? dateLabel
+              : period === "year"
+              ? year
+              : month + " " + year;
+
+          card.innerHTML = `
+            <div class="recipe-card-header">
+              <div>
+                <h4 class="recipe-title">${recipe.name}</h4>
+                <p class="recipe-subtitle">${subtitle}</p>
+              </div>
+              <button class="icon-button" type="button">🍽</button>
+            </div>
+
+            <div class="recipe-meta">
+              <span class="badge badge-medium">Top</span>
+              <span class="meta-time">⏱ ${recipe.cookingTime}</span>
+            </div>
+
+            <div class="recipe-body">
+              <p class="label">Ingredients:</p>
+              <p class="ingredients">${ingredientsHtml}</p>
+              <p class="label" style="margin-top:8px;">Instructions:</p>
+              <p class="ingredients">${instructionsHtml}</p>
+            </div>
+
+            <div class="card-actions"></div>
+          `;
+
+          const saveBtn = document.createElement("button");
+          saveBtn.className = "save-btn";
+          saveBtn.textContent = "Save as PDF";
+          saveBtn.addEventListener("click", () => SaveRecipeAsPDF(recipe));
+
+          card.querySelector(".card-actions").appendChild(saveBtn);
+          chatMessages.appendChild(card);
+        });
+      }
+
+      // ═══ Main generation logic (with period selection + DB check) ═══
+      async function createTOPRecipes() {
+        // show loading in grid
+        chatMessages.innerHTML = `
+          <div class="message bot" id="loading-message">Generating...</div>
+        `;
+
+        const now = new Date();
+        let month = months[now.getMonth()];
+        let year = now.getFullYear();
+        let day = null;
+        const period = periodSelect.value; // 'day' | 'month' | 'year'
+        let dateLabel = "";
+
+        if (period === "day") {
+          const val = dayInput.value || now.toISOString().slice(0, 10);
+          dayInput.value = val;
+          const d = new Date(val);
+          month = months[d.getMonth()];
+          year = d.getFullYear();
+          day = d.getDate();
+          dateLabel = val;
+          if (sectionLabel) {
+            sectionLabel.textContent = `Top recipes for ${val}`;
+          }
+
+          // 1) FIRST: try to get existing top recipes for this date
+          try {
+            const existingResp = await fetch(
+              "{% url 'get-top-recipes' %}" + `?date=${encodeURIComponent(val)}`
+            );
+            const existingData = await existingResp.json();
+            if (existingData.recipes && existingData.recipes.length >= 3) {
+              document.getElementById("loading-message")?.remove();
+              renderRecipesList(existingData.recipes, period, month, year, val);
+              return; // stop here, no need to generate
+            }
+          } catch (e) {
+            console.error("Error checking existing top recipes:", e);
+            // fall through to generation
+          }
+        } else if (period === "year") {
+          if (sectionLabel) {
+            sectionLabel.textContent = `Top recipes in ${year}`;
+          }
+        } else {
+          // month
+          if (sectionLabel) {
+            sectionLabel.textContent = `Top recipes in ${month} ${year}`;
+          }
         }
 
-        async function sendPrompt(month, year){
-            let data = {
-                "promptType": "TOP",
-                "month": month,
-                "year": year,
-            };
-            let response = await fetch("{% url 'send_prompt' %}", {
+        // 2) If we reach here, we need to generate (or for month/year always)
+        let response;
+        try {
+          response = await sendPrompt(month, year, period, day);
+        } catch (err) {
+          console.error("Error while fetching TOP recipes:", err);
+          chatMessages.innerHTML = `
+            <div class="message bot">
+              Error generating recipes. Please try again.
+            </div>
+          `;
+          return;
+        }
+
+        document.getElementById("loading-message")?.remove();
+
+        if (!response || !response.recipes || response.recipes.length === 0) {
+          chatMessages.innerHTML = `
+            <div class="message bot">
+              No recipes found for selected period.
+            </div>
+          `;
+          return;
+        }
+
+        // 3) Render recipes
+        renderRecipesList(
+          response.recipes,
+          period,
+          month,
+          year,
+          dateLabel || dayInput.value
+        );
+
+        // 4) If it's DAY period, save them as top recipes for this date
+        if (period === "day") {
+          for (const recipe of response.recipes) {
+            try {
+              await fetch("{% url 'save-topRecipe' %}", {
                 method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRFToken': csrftoken
+                  "X-CSRFToken": csrftoken,
+                  "Content-Type": "application/json",
                 },
-                body: JSON.stringify(data)
-            });
-            let responseData = await response.json();
-            responseData = JSON.parse(responseData.data);
-            return responseData;
+                body: JSON.stringify({
+                  ...recipe,
+                  date: dateLabel || dayInput.value, // <--- send date to backend
+                }),
+              });
+            } catch (err) {
+              console.error("Error saving top recipe:", err);
+            }
+          }
+        }
+      }
+
+      async function sendPrompt(month, year, period, day = null) {
+        let data = {
+          promptType: "TOP",
+          month: month,
+          year: year,
+          period: period, // 'day' | 'month' | 'year'
+          day: day, // either number or null
+        };
+        let response = await fetch("{% url 'send_prompt' %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRFToken": csrftoken,
+          },
+          body: JSON.stringify(data),
+        });
+        let responseData = await response.json();
+        responseData = JSON.parse(responseData.data);
+        return responseData;
       }
     </script>
-</body>
+  </body>
 </html>

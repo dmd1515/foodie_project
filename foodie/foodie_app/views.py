@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import TemporaryImage
+from .models import TemporaryImage, TopRecipe
 from .models import GeneratedRecipe
 from PIL import Image
 from django.http import JsonResponse
@@ -14,6 +14,9 @@ import json
 import ast
 from django.core.serializers.json import DjangoJSONEncoder
 from bson import ObjectId
+from django.views.decorators.http import require_GET
+from django.utils.dateparse import parse_date
+from django.utils import timezone
 
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def upload_image(request):
@@ -151,6 +154,66 @@ def save_generated_recipe(request):
     )
 
     return JsonResponse({'success': True, 'id': obj.id})
+@require_POST
+def save_top_recipe(request):
+    data = json.loads(request.body or "{}")
+    if not data:
+        return JsonResponse({'error': 'No text provided'}, status=400)
+
+    date_str = data.get("date")
+    top_date = parse_date(date_str) if date_str else None
+    if not top_date:
+        return JsonResponse({'error': 'Invalid or missing date'}, status=400)
+
+    obj = TopRecipe.objects.create(
+        name=data.get('name', 'Untitled Recipe'),
+        cookingTime=data.get('cookingTime', ''),
+        # you’re using TextField, so store lists as JSON string
+        ingredients=json.dumps(data.get('ingredients', [])),
+        instructions=json.dumps(data.get('instructions', [])),
+        top_date=top_date,
+    )
+
+    return JsonResponse({'success': True, 'id': str(obj.id)})
+
+@require_GET
+def get_top_recipes_by_date(request):
+    """
+    Returns up to 3 recipes for a given date (YYYY-MM-DD).
+    Shared for all users.
+    """
+    date_str = request.GET.get("date")
+    if not date_str:
+        return JsonResponse({"recipes": []})
+
+    date_obj = parse_date(date_str)
+    if not date_obj:
+        return JsonResponse({"recipes": []})
+
+    qs = (TopRecipe.objects
+          .filter(top_date=date_obj)   # <--- filter by top_date
+          .order_by("id")[:3])
+
+    recipes = []
+    for r in qs:
+        try:
+            ingredients = json.loads(r.ingredients)
+        except Exception:
+            ingredients = [r.ingredients]
+
+        try:
+            instructions = json.loads(r.instructions)
+        except Exception:
+            instructions = [r.instructions]
+
+        recipes.append({
+            "name": r.name,
+            "cookingTime": r.cookingTime,
+            "ingredients": ingredients,
+            "instructions": instructions,
+        })
+
+    return JsonResponse({"recipes": recipes})
 
 @login_required
 def my_recipes(request):
