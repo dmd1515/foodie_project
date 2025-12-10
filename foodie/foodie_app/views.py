@@ -28,8 +28,6 @@ def upload_image(request):
             temp_image = TemporaryImage(image=request.FILES["image"])
             temp_image.save()
             print("Saved TemporaryImage with id:", temp_image.pk, type(temp_image.pk))
-            temp_image.imageObjectId = temp_image.pk
-            temp_image.save()
 
             return JsonResponse({
                 "status": "success",
