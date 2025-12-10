@@ -28,10 +28,12 @@ def upload_image(request):
             temp_image = TemporaryImage(image=request.FILES["image"])
             temp_image.save()
             print("Saved TemporaryImage with id:", temp_image.pk, type(temp_image.pk))
+            temp_image.imageObjectId = temp_image.pk
+            temp_image.save()
 
             return JsonResponse({
                 "status": "success",
-                "image_id": str(temp_image.pk),
+                "image_id": temp_image.pk,
                 "message": "Image saved for processing"
             })
         except Exception as e:
@@ -48,8 +50,8 @@ def detect_objects(request):
                     status=400,
                 )
            
-            obj_id = ObjectId(image_id)  # string -> ObjectId
-            temp_image = TemporaryImage.objects.get(pk=obj_id)
+            obj_id = image_id  # string -> ObjectId
+            temp_image = TemporaryImage.objects.get(id=obj_id)
 
             print("Hieeee, found temp_image:", temp_image)
 
