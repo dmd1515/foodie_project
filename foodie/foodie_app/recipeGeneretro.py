@@ -57,6 +57,7 @@ def trimResponse(responseText):
         return responseText
 
 def sendPrompt(data):
+    '''
     prompt = ""
     if(data["promptType"] == "default"):
         prompt = generatePrompt(data)

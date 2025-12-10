@@ -9,20 +9,44 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
     </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>    </script>
-    <link rel="stylesheet" href ="{% static 'styles.css' %}" />
+    <link rel="stylesheet" href ="{% static 'stylesHome.css' %}" />
 </head>
 <body>
-    <!-- Sidebar -->
-     <div class="sidebar">
-        <h1>FOODIE</h1>
-        <ul>
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'my_recipes' %}">Recipes</a></li>
-            <li><a href="{% url 'top_recipes' %}">TOP Recipes</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-            <li><a href="{% url 'delete_account' %}" >Delete Account</a></li>
-        </ul>
-    </div>
+    <div class="layout">
+     <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1>FOODIE</h1>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a
+            href="{% url 'home' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+          >
+            Home
+          </a>
+
+          <a
+            href="{% url 'my_recipes' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'my_recipes' %}active{% endif %}"
+          >
+            History
+          </a>
+
+          <a
+            href="{% url 'top_recipes' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'top_recipes' %}active{% endif %}"
+          >
+            Top Recipes
+          </a>
+
+          <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+          <a href="{% url 'delete_account' %}" class="nav-link danger"
+            >Delete Account</a
+          >
+        </nav>
+      </aside>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -33,7 +57,7 @@
             
             <div class="chat-messages" id="chat-messages">
                 <!-- Example messages -->
-                <div class="message bot" id="initial-message-1">Hello! How can I help you today?</div>
+                <div class="message bot" id="initial-message-1">Hello! Please write down your products for me</div>
             </div>
         </div>
 
@@ -120,12 +144,32 @@
                 </div>
             </form>
         </div>
+        </div>
     </div>
     <script type="module" >
         
         let useExtraIngredients = false;
         const chatInput = document.getElementById('chat-input');
         const chatMessages = document.getElementById('chat-messages');
+        function showTypingIndicator() {
+  if (document.getElementById("typing-indicator")) return; // already shown
+
+  const typing = document.createElement("div");
+  typing.id = "typing-indicator";
+  typing.className = "message bot typing";
+  typing.innerHTML = `
+    <div class="typing-indicator">
+      <span></span><span></span><span></span>
+    </div>
+  `;
+  chatMessages.appendChild(typing);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTypingIndicator() {
+  const typing = document.getElementById("typing-indicator");
+  if (typing) typing.remove();
+}
 
         document.getElementById("add-photo-button").addEventListener("click", function () {
             document.getElementById("upload-modal").style.display = "flex"; // Open the modal
@@ -217,7 +261,7 @@
             document.getElementById('char-count').textContent = '0';
             chatMessages.scrollTop = chatMessages.scrollHeight;
             let geminiResponse = "";
-            
+            showTypingIndicator();
             // NEW: Process image only on Send button
             if (selectedImageFile) {
                 try {
@@ -286,7 +330,7 @@
             if (messageText) {
                 geminiResponse = await sendUserPrompt(messageText);
             }
-            
+            hideTypingIndicator();
             // Display response
             if (geminiResponse) {
                 displayResponse(geminiResponse, chatMessages);
@@ -301,49 +345,60 @@
             document.getElementById('char-count').textContent = '0';
         });
 
-        function displayResponse(resposne, chatMessages){
-            resposne.recipes.forEach((recipe) => {
-                    const botMessage = document.createElement('div');
-                    botMessage.className = 'message bot';
-                    botMessage.innerHTML = `<strong>${recipe.name}</strong><br/>` +
-                                            `Cooking Time: ${recipe.cookingTime}<br/>` +
-                                            `<strong>Ingredients:</strong><br/>${recipe.ingredients.map(ing => `- ${ing}`).join('<br/>')}<br/>` +
-                                            `<strong>Instructions:</strong><br/>${recipe.instructions.map((inst, index) => `${index + 1}. ${inst}`).join('<br/>')}`;
-                    
-                    const saveBtn = document.createElement('button');
-                    saveBtn.className = 'edit-button';
-                    saveBtn.textContent = 'Save as PDF';
-                    saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
-                    botMessage.appendChild(saveBtn);
-                    
-                    chatMessages.appendChild(botMessage);
+        function displayResponse(response, chatMessages) {
+    // just in case, remove typing bubbles
+    hideTypingIndicator();
 
-                    try {
-                        fetch("{% url 'save_recipe' %}", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRFToken": csrftoken,
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(recipe),
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                console.log("Saved with id:", data.id);
-                            } else {
-                                console.error("Error:", data);
-                            }
-                        });
-                    } catch (error) {
-                        console.error("Error:", error);
-                        const errorMsg = document.createElement('div');
-                        errorMsg.className = 'message bot';
-                        errorMsg.textContent = "⚠️ Error: " + error.message;
-                        chatMessages.appendChild(errorMsg);
-                    }
-                });
+    response.recipes.forEach((recipe) => {
+        const botMessage = document.createElement('div');
+        botMessage.className = 'message bot bot-recipe-card';
+
+        botMessage.innerHTML =
+            `<strong>${recipe.name}</strong><br/>` +
+            `Cooking Time: ${recipe.cookingTime}<br/>` +
+            `<strong>Ingredients:</strong><br/>${recipe.ingredients.map(
+                ing => `- ${ing}`
+            ).join('<br/>')}<br/>` +
+            `<strong>Instructions:</strong><br/>${recipe.instructions.map(
+                (inst, index) => `${index + 1}. ${inst}`
+            ).join('<br/>')}`;
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'edit-button';
+        saveBtn.textContent = 'Save as PDF';
+        saveBtn.addEventListener('click', () => SaveRecipeAsPDF(botMessage));
+        botMessage.appendChild(saveBtn);
+
+        chatMessages.appendChild(botMessage);
+
+        try {
+            fetch("{% url 'save_recipe' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrftoken,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(recipe),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Saved with id:", data.id);
+                } else {
+                    console.error("Error:", data);
+                }
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'message bot';
+            errorMsg.textContent = "⚠️ Error: " + error.message;
+            chatMessages.appendChild(errorMsg);
         }
+    });
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
         // Edit message logic
         function editMessage(messageElement) {

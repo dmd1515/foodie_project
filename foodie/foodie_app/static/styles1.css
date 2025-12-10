@@ -12,7 +12,11 @@ body {
 
 /* Sidebar */
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 260px;
+  height: 100vh; /* full viewport height */
   background: #000;
   color: #fff;
   display: flex;
@@ -61,9 +65,13 @@ body {
 
 /* Pagrindinis blokas dešinėje */
 .main-content {
+  margin-left: 260px; /* same as sidebar width */
   flex: 1;
-  padding: 24px 40px;
+  min-height: 100vh;
+  padding: 32px 40px;
   background: #f3f4f6;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 /* Chat area viduje */
@@ -331,37 +339,36 @@ body {
 }
 
 .tag-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .tag-modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-    text-align: center;
-    
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
 }
 
 .tag-modal-content .add-tag,
 .tag-modal-content .cancel-btn {
   padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    flex: 1;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  flex: 1;
 }
 
-.tag-modal-content .add-tag{
+.tag-modal-content .add-tag {
   background-color: #111827;
   color: #fff;
   margin-right: 10px;
@@ -372,22 +379,21 @@ body {
   color: #fff;
 }
 
-
 .tag-modal-content input {
-    padding: 10px;
-    width: 100%;
-    box-sizing: border-box;
-    background-color: #fff;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    resize: none;
-    font-size: 1rem;
-    margin-bottom: 20px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  resize: none;
+  font-size: 1rem;
+  margin-bottom: 20px;
 }
 
 .tag-modal-content label {
-    display: block;
-    font-size: 1rem;
-    margin-bottom: 5px;
-    text-align: left;
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 5px;
+  text-align: left;
 }
