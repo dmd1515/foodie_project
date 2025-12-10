@@ -196,8 +196,6 @@ body {
     background-color: #5a6268; /* Darker gray on hover */
 }
 
-
-
 /* Sidebar Styles */
 .sidebar {
     width: 15%;
@@ -293,6 +291,7 @@ body {
     background-color: #2B7FFF;
     color: #fff;
     margin-left: auto; /* Align to the right */
+    padding-top: 30px;
 }
 
 .chat-messages .message.bot {
