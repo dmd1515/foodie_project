@@ -49,6 +49,7 @@
             <h2>Recipe History</h2>
             <div class="history-filters">
                 <input type="date" class="date-input" />
+                <select class="tag-filter"></select>
             </div>
         </div>
 
@@ -96,6 +97,9 @@
 
     const grid = document.getElementById("chat-messages");
     const dateInput = document.querySelector(".date-input");
+    const tagSelect = document.querySelector(".tag-filter");
+    let currentDateFilter = null;
+    let currentTagFilter = "";
     let recipeId = 0;
 
     // Ištraukiam datą YYYY-MM-DD iš created_at
@@ -183,8 +187,40 @@
         return cookieValue;
     }
 
+    function getUniqueTags(recipes) {
+        const set = new Set();
+        recipes.forEach(r => {
+            if (r.tag && r.tag.trim() !== "") {
+                set.add(r.tag.trim());
+            }
+        });
+        return Array.from(set).sort();
+    }
+
+    function populateTagDropdown() {
+        if (!tagSelect) return;
+
+        // Clear existing options
+        tagSelect.innerHTML = "";
+
+        // "-" option for all recipes
+        const allOption = document.createElement("option");
+        allOption.value = "";
+        allOption.textContent = "All tags";
+        tagSelect.appendChild(allOption);
+
+        // Add one option per unique tag
+        const tags = getUniqueTags(recipes);
+        tags.forEach(tag => {
+            const opt = document.createElement("option");
+            opt.value = tag;
+            opt.textContent = tag;
+            tagSelect.appendChild(opt);
+        });
+    }   
+
   // Pagrindinė funkcija – perpiešti korteles su (ar be) datos filtro
-    function renderRecipes(filterDate = null) {
+    function renderRecipes(filterDate = null, filterTag = null) {
         grid.innerHTML = "";
         const csrftoken = getCookie('csrftoken');
 
@@ -192,6 +228,10 @@
         const recipeDate = getRecipeDate(recipe);
 
         if (filterDate && recipeDate !== filterDate) {
+            return;
+        }
+
+        if (filterTag && recipe.tag !== filterTag) {
             return;
         }
 
@@ -281,16 +321,25 @@
         }
     }
 
+    populateTagDropdown();
   // Inicinis atvaizdavimas – visi receptai
-  renderRecipes();
+    renderRecipes();
 
-  // Filtravimas pagal datą
-  if (dateInput) {
-    dateInput.addEventListener("change", () => {
-      const selected = dateInput.value || null;
-      renderRecipes(selected);
+    // Filtravimas pagal datą
+    if (dateInput) {
+        dateInput.addEventListener("change", () => {
+        currentDateFilter = dateInput.value || null;
+
+        renderRecipes(filterDate = currentDateFilter, filterTag = currentTagFilter);
+        });
+    }
+
+    if (tagSelect) {
+    tagSelect.addEventListener("change", () => {
+        currentTagFilter = tagSelect.value || ""; // "" means "all tags"
+        renderRecipes(filterDate = currentDateFilter, filterTag = currentTagFilter);
     });
-  }
+}
 
     async function sendTag(newTag, recipeId){
         const csrftoken = getCookie('csrftoken');
