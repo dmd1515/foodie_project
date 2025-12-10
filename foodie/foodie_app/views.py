@@ -189,6 +189,8 @@ def edit_recipe(request, recipe_id):
     except GeneratedRecipe.DoesNotExist:
         return JsonResponse({'error': 'Recipe not found.'}, status=404)
 
+    print("hIEEEE")
+
     if request.method == "POST":
         data = json.loads(request.body)
         recipe.tag = data.get('tag', recipe.tag)
