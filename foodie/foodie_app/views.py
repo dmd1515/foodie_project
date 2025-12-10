@@ -13,18 +13,22 @@ from .recipeGeneretro import *
 import json
 import ast
 from django.core.serializers.json import DjangoJSONEncoder
+from bson import ObjectId
 
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def upload_image(request):
+
     if request.method == "POST" and request.FILES.get("image"):
         try:
+
             # Just save temporarily, no processing
             temp_image = TemporaryImage(image=request.FILES["image"])
             temp_image.save()
-            
+            print("Saved TemporaryImage with id:", temp_image.pk, type(temp_image.pk))
+
             return JsonResponse({
                 "status": "success",
-                "image_id": temp_image.id,
+                "image_id": str(temp_image.pk),
                 "message": "Image saved for processing"
             })
         except Exception as e:
@@ -34,8 +38,18 @@ def detect_objects(request):
     if request.method == "POST":
         try:
             image_id = request.POST.get("image_id")
-            temp_image = TemporaryImage.objects.get(id=image_id)
-            
+            print("RAW image_id from POST:", image_id, type(image_id))
+            if not image_id:
+                return JsonResponse(
+                    {"status": "error", "message": "image_id missing"},
+                    status=400,
+                )
+           
+            obj_id = ObjectId(image_id)  # string -> ObjectId
+            temp_image = TemporaryImage.objects.get(pk=obj_id)
+
+            print("Hieeee, found temp_image:", temp_image)
+
             # Actual YOLO processing
             img = Image.open(temp_image.image)
             if img.mode != 'RGB':
@@ -54,9 +68,17 @@ def detect_objects(request):
                 "status": "success", 
                 "objects": detected_items
             })
-            
+        except TemporaryImage.DoesNotExist:
+            return JsonResponse(
+                {"status": "error", "message": "TemporaryImage not found"},
+                status=404
+            )
         except Exception as e:
+            import traceback
+            print("detect_objects ERROR:", repr(e))
+            traceback.print_exc()
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
+        
 def delete_uploaded_image(request, image_id):
     if request.method == "DELETE":
         try:

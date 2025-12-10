@@ -1,4 +1,5 @@
 from django.db import models
+from djongo import models as altModels
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 
@@ -11,9 +12,14 @@ def validate_image_format(image):
     if not image.name.lower().endswith('.jpg') and not image.name.lower().endswith('.jpeg'):
         raise ValidationError("Only JPEG images are allowed.")
     
-class TemporaryImage(models.Model):
-    image = models.ImageField(upload_to='temp_images/', validators=[validate_image_size, validate_image_format])
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+class TemporaryImage(altModels.Model):
+    _id = altModels.ObjectIdField(primary_key=True)  # Mongo-style PK
+
+    image = altModels.ImageField(
+        upload_to='temp_images/',
+        validators=[validate_image_size, validate_image_format]
+    )
+    uploaded_at = altModels.DateTimeField(auto_now_add=True)
     class Meta:
         db_table = 'temporaryImages'
 
